@@ -35,7 +35,7 @@
         header {
             background-color: var(--deep-blue);
             color: var(--bright-text);
-            padding: 1.2rem 2rem;
+            padding: 4rem 2rem !important;
             text-align: center;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
             display: flex; align-items: center; justify-content: center;
@@ -153,11 +153,12 @@
             gap: clamp(0.8rem, 3vw, 2rem); margin-top: 1.5rem;
         }
         .option {
-            width: clamp(65px, 18vw, 90px); height: clamp(65px, 18vw, 90px);
+            min-width: clamp(80px, 20vw, 110px); height: clamp(65px, 18vw, 90px);
             background: var(--bright-text); border: 4px solid var(--deep-blue);
             border-radius: 15px; display: flex; align-items: center; justify-content: center;
-            font-size: clamp(1.5rem, 5vw, 2.5rem); cursor: pointer;
+            font-size: clamp(1.2rem, 4.5vw, 2.2rem); cursor: pointer;
             transition: all 0.2s; user-select: none; font-family: inherit; font-weight: bold;
+            padding: 0 15px; white-space: nowrap;
         }
         .option:hover { background: white; transform: scale(1.1); }
         .option.wrong-anim {
@@ -168,6 +169,97 @@
             0%,100%{transform:translateX(0)} 25%{transform:translateX(-10px)}
             50%{transform:translateX(10px)} 75%{transform:translateX(-10px)}
         }
+
+        /* ── 추가 게임 스타일 ── */
+        .clock-area { display: flex; justify-content: center; margin: 2rem 0; }
+        .clock-face {
+            width: 260px; height: 260px; border: 8px solid var(--deep-blue);
+            border-radius: 50%; position: relative; background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .clock-center {
+            width: 12px; height: 12px; background: var(--deep-blue);
+            border-radius: 50%; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); z-index: 10;
+        }
+        .hand {
+            position: absolute; bottom: 50%; left: 50%;
+            transform-origin: bottom center; border-radius: 10px;
+            background: var(--deep-blue); transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .hand-hour { width: 8px; height: 60px; margin-left: -4px; z-index: 5; }
+        .hand-minute { width: 5px; height: 90px; margin-left: -2.5px; z-index: 4; background: #666; }
+        .clock-number {
+            position: absolute; width: 40px; height: 40px; text-align: center;
+            line-height: 40px; font-weight: 900; color: var(--deep-blue); font-size: 1.6rem;
+        }
+
+        .scale-area {
+            position: relative; width: 100%; height: 400px;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+            margin: 0.2rem 0; overflow: visible;
+        }
+        .scale-base {
+            width: 24px; height: 300px; background: #8D6E63; border-radius: 12px;
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 1;
+        }
+        .scale-base::after {
+            content: ""; position: absolute; bottom: 0; left: 50%;
+            transform: translateX(-50%); width: 180px; height: 25px;
+            background: #5D4037; border-radius: 12px 12px 0 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .scale-beam {
+            width: 360px; height: 12px; background: #A1887F; border-radius: 6px;
+            position: absolute; top: 120px; left: 50%; transform: translateX(-50%) rotate(0deg);
+            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: center center; z-index: 2;
+        }
+        .scale-beam::before {
+            content: ""; position: absolute; top: -12px; left: 50%;
+            transform: translateX(-50%); width: 36px; height: 36px;
+            background: #FFD700; border-radius: 50%; border: 4px solid #8D6E63;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        .scale-pan {
+            position: absolute; top: 6px; width: 150px; display: flex; justify-content: center;
+            transform-origin: top center; transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .scale-pan-left { left: 0; transform: translateX(-50%) rotate(0deg); }
+        .scale-pan-right { right: 0; transform: translateX(50%) rotate(0deg); }
+        
+        .scale-pan::before {
+            content: ""; position: absolute; top: 0; width: 2px; height: 90px; background: #9E9E9E;
+            left: 50%; transform: translateX(-50%);
+        }
+        
+        .compare-box {
+            width: 105px; height: 105px; background: white; border: 5px solid var(--deep-blue);
+            border-radius: 20px; display: flex; align-items: center; justify-content: center;
+            font-size: 3rem; font-weight: 900; color: var(--deep-blue); cursor: pointer;
+            transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            position: relative; top: 90px; z-index: 3;
+        }
+        .compare-box:hover { transform: scale(1.05); background: var(--bright-text); }
+        .compare-box.correct-heavy { border-color: var(--success-color); background: #E8F5E9; }
+
+        .money-tray {
+            background: #E8ECF0; border-radius: 20px; padding: 2rem;
+            min-height: 200px; display: flex; flex-wrap: wrap; justify-content: center;
+            gap: 1rem; margin: 1.5rem 0; border: 3px dashed #CBD5E0;
+        }
+        .coin {
+            width: 70px; height: 70px; border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-weight: bold; border: 3px solid rgba(0,0,0,0.1);
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2); position: relative;
+        }
+        .coin::after { content: "원"; font-size: 0.7rem; margin-top: -2px; }
+        .coin-500 { background: linear-gradient(135deg, #E2E2E2, #B0B0B0); width: 85px; height: 85px; font-size: 1.4rem; color: #444; }
+        .coin-100 { background: linear-gradient(135deg, #F0F0F0, #D0D0D0); width: 75px; height: 75px; font-size: 1.2rem; color: #555; }
+        .coin-50 { background: linear-gradient(135deg, #F8F8F8, #E0E0E0); width: 65px; height: 65px; font-size: 1.1rem; color: #666; }
+        .coin-10 { background: linear-gradient(135deg, #D9A066, #A67041); width: 60px; height: 60px; font-size: 1rem; color: white; border-color: #8C5A2B; }
 
         /* ── 결과 화면 공통 ── */
         #result-screen, #spider-result-screen {
@@ -199,6 +291,9 @@
             padding: 1.2rem 1rem 1.8rem;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             text-align: center;
+            --sp: min(180px, 38vw);
+            --cr: calc(var(--sp) * 0.27);
+            --cc: calc(var(--sp) * 0.31);
         }
 
         /*
@@ -229,9 +324,6 @@
 
         /* 개별 거미줄 컨테이너 */
         .spider-wrap {
-            --sp: min(180px, 38vw);
-            --cr: calc(var(--sp) * 0.27);    /* 코너 원 지름 */
-            --cc: calc(var(--sp) * 0.31);    /* 중앙 원 지름 */
             position: relative;
             width: var(--sp);
             height: var(--sp);
@@ -331,13 +423,14 @@
             margin: 0.5rem auto 0;
         }
         .bank-tile {
-            /* 원형 */
-            width: clamp(58px, 14vw, 72px); height: clamp(58px, 14vw, 72px);
+            /* 슬롯과 100% 동일한 크기 */
+            width: var(--cr); 
+            height: var(--cr);
             border-radius: 50%;
             border: 3px solid var(--deep-blue);
             background: var(--bright-text);
             display: flex; align-items: center; justify-content: center;
-            font-size: clamp(1.2rem, 4.5vw, 1.8rem); font-weight: bold; color: var(--deep-blue);
+            font-size: clamp(1.1rem, 3.5vw, 1.6rem); font-weight: bold; color: var(--deep-blue);
             cursor: grab; user-select: none; touch-action: none;
             transition: opacity 0.15s, transform 0.15s; font-family: inherit;
             box-shadow: 0 2px 8px rgba(0,0,102,0.12);
@@ -354,7 +447,7 @@
             display: flex; align-items: center; justify-content: center;
             font-weight: bold; color: var(--deep-blue);
             z-index: 9999; pointer-events: none;
-            transform: scale(1.18);
+            transform: scale(1.0); /* 1:1 크기로 변경 */
             box-shadow: 0 8px 25px rgba(0,0,0,0.25);
             font-family: 'Noto Sans KR', sans-serif;
         }
@@ -389,9 +482,9 @@
         ══════════════════════════════════════════════ */
         @media (orientation: landscape) {
             /* 헤더: 이미지 높이를 vh 기준으로 축소해 세로 공간 확보 */
-            header { padding: 0.4rem 1.5rem; }
+            header { padding: 0.28rem 1.5rem !important; }
             header h1 { font-size: min(1.9rem, 5.5vh); }
-            .header-paw { height: min(60px, 9vh); }
+            .header-paw { height: min(120px, 18vh) !important; }
 
             /* 푸터 숨김 */
             footer { display: none; }
@@ -400,10 +493,10 @@
             main { margin: 0.4rem auto; }
 
             /* 거미 컨테이너 상하 패딩 축소 */
-            #spider-container { padding: 0.6rem 1rem 0.8rem; }
-
-            /* 거미줄 크기: vh 기준 (가로모드 높이에 맞춤) */
-            .spider-wrap { --sp: min(180px, 26vh); }
+            #spider-container { 
+                padding: 0.6rem 1rem 0.8rem; 
+                --sp: min(180px, 26vh);
+            }
 
             /* 거미줄 사이 여백 축소 */
             .spider-puzzles { margin: 0.5rem 0 0.3rem; }
@@ -436,23 +529,10 @@
             header h1 { font-size: min(1.1rem, 4vh); }
             .header-paw { height: min(38px, 8vh); }
             main { margin: 0.2rem auto; }
-            #spider-container { padding: 0.4rem 0.7rem 0.5rem; }
-
-            /* 거미줄+뱅크 가로 배치 */
-            .spider-body {
-                flex-direction: row;
-                align-items: center;
-                justify-content: center;
-                gap: clamp(0.8rem, 2.5vw, 2rem);
-                margin-top: 0.1rem;
+            #spider-container { 
+                padding: 0.4rem 0.7rem 0.5rem; 
+                --sp: min(110px, 22vh);
             }
-            .spider-right {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 0.4rem;
-            }
-            .spider-wrap { --sp: min(110px, 22vh); }
             .spider-puzzles { margin: 0; gap: clamp(0.6rem, 1.5vw, 1rem); }
             .hint-row { margin: 0; }
 
@@ -504,19 +584,72 @@
                 <span class="icon">🕷️</span>
                 <h2>거미 더하기</h2>
             </div>
-            <div class="activity-card card-wip">
-                <span class="icon">🔧</span>
-                <h2>제작 중</h2>
+            <div class="activity-card" onclick="startClock()">
+                <span class="icon">🕰️</span>
+                <h2>시계 읽기</h2>
             </div>
-            <div class="activity-card card-wip">
-                <span class="icon">🔧</span>
-                <h2>제작 중</h2>
+            <div class="activity-card" onclick="startCompare()">
+                <span class="icon">⚖️</span>
+                <h2>크기 비교</h2>
             </div>
-            <div class="activity-card card-wip">
-                <span class="icon">🔧</span>
-                <h2>제작 중</h2>
+            <div class="activity-card" onclick="startMoney()">
+                <span class="icon">💰</span>
+                <h2>돈 세기</h2>
             </div>
         </div>
+    </div>
+
+    <!-- ── 시계 읽기 화면 ── -->
+    <div id="clock-container" style="display:none;">
+        <div class="game-header">
+            <button class="back-btn" onclick="goHome()">🏠 처음으로</button>
+            <div id="clock-score-display">⭐ 0 / 0</div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="clock-progress-fill"></div></div>
+        <div id="clock-question-text">몇 시일까요?</div>
+        <div class="clock-area">
+            <div class="clock-face">
+                <div class="clock-numbers" id="clock-numbers"></div>
+                <div class="hand hand-hour" id="hand-hour"></div>
+                <div class="hand hand-minute" id="hand-minute"></div>
+                <div class="clock-center"></div>
+            </div>
+        </div>
+        <div class="options-area" id="clock-options"></div>
+    </div>
+
+    <!-- ── 크기 비교 화면 ── -->
+    <div id="compare-container" style="display:none;">
+        <div class="game-header">
+            <button class="back-btn" onclick="goHome()">🏠 처음으로</button>
+            <div id="compare-score-display">⭐ 0 / 0</div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="compare-progress-fill"></div></div>
+        <div id="compare-question-title" style="font-size: 1.5rem; font-weight: bold; color: var(--deep-blue); margin-bottom: 0.2rem;">더 큰 수는?</div>
+        
+        <div class="scale-area">
+            <div class="scale-base"></div>
+            <div class="scale-beam" id="scale-beam">
+                <div class="scale-pan scale-pan-left">
+                    <div class="compare-box" id="compare-box-1" onclick="handleCompare(0)">0</div>
+                </div>
+                <div class="scale-pan scale-pan-right">
+                    <div class="compare-box" id="compare-box-2" onclick="handleCompare(1)">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 돈 세기 화면 ── -->
+    <div id="money-container" style="display:none;">
+        <div class="game-header">
+            <button class="back-btn" onclick="goHome()">🏠 처음으로</button>
+            <div id="money-score-display">⭐ 0 / 0</div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="money-progress-fill"></div></div>
+        <div id="money-question-text">모두 얼마일까요?</div>
+        <div class="money-tray" id="money-tray"></div>
+        <div class="options-area" id="money-options"></div>
     </div>
 
     <!-- 기존 게임 화면 -->
@@ -606,13 +739,260 @@ function startGame(mode) {
 }
 
 function showMenu() {
-    ['game-container','result-screen','spider-container','spider-result-screen']
-        .forEach(id => { document.getElementById(id).style.display = 'none'; });
+    ['game-container','result-screen','spider-container','spider-result-screen','clock-container','compare-container','money-container']
+        .forEach(id => { 
+            const el = document.getElementById(id);
+            if(el) el.style.display = 'none'; 
+        });
     document.getElementById('menu-screen').style.display = 'block';
 }
 
-function goHome() { history.back(); }
+function goHome() { 
+    if(window.location.hash) {
+        history.back();
+    } else {
+        showMenu();
+    }
+}
 window.addEventListener('popstate', e => { if (!e.state || e.state.page==='home') showMenu(); });
+
+// ════════════════════════════════
+// 시계 읽기
+// ════════════════════════════════
+const clockState = { round:0, total:5, score:0, hour:0, minute:0, currentHDeg:0, currentMDeg:0 };
+
+function startClock() {
+    clockState.round = 1; clockState.score = 0;
+    clockState.currentHDeg = 0; clockState.currentMDeg = 0; // 초기화
+    history.pushState({page:'clock'},'','#clock');
+    document.getElementById('menu-screen').style.display='none';
+    document.getElementById('clock-container').style.display='block';
+    initClockFace();
+    loadClockRound();
+}
+
+function initClockFace() {
+    const numbers = document.getElementById('clock-numbers');
+    numbers.innerHTML = '';
+    for(let i=1; i<=12; i++) {
+        const num = document.createElement('div');
+        num.className = 'clock-number';
+        num.innerText = i;
+        const angle = (i * 30 - 90) * (Math.PI / 180);
+        const x = 130 + 100 * Math.cos(angle) - 20; // 40px 너비의 절반
+        const y = 130 + 100 * Math.sin(angle) - 20; // 40px 높이의 절반
+        num.style.left = x + 'px';
+        num.style.top = y + 'px';
+        numbers.appendChild(num);
+    }
+}
+
+function loadClockRound() {
+    if(clockState.round > clockState.total) { showClockResult(); return; }
+    
+    // 정시 또는 30분 단위 (6세 수준)
+    clockState.hour = rand(1, 12);
+    clockState.minute = Math.random() > 0.5 ? 0 : 30;
+
+    document.getElementById('clock-progress-fill').style.width = ((clockState.round-1)/clockState.total*100)+'%';
+    document.getElementById('clock-score-display').innerText = `⭐ ${clockState.score} / ${clockState.round-1}`;
+    
+    // 시계 방향 회전 (누적 각도 보정)
+    let nextHDeg = (clockState.hour % 12) * 30 + (clockState.minute === 30 ? 15 : 0);
+    let nextMDeg = clockState.minute * 6;
+
+    // 현재 각도보다 큰 값으로 설정하여 항상 시계 방향 회전 유도
+    while (nextHDeg <= clockState.currentHDeg) nextHDeg += 360;
+    while (nextMDeg <= clockState.currentMDeg) nextMDeg += 360;
+
+    clockState.currentHDeg = nextHDeg;
+    clockState.currentMDeg = nextMDeg;
+
+    document.getElementById('hand-hour').style.transform = `rotate(${nextHDeg}deg)`;
+    document.getElementById('hand-minute').style.transform = `rotate(${nextMDeg}deg)`;
+
+    // 보기 생성
+    const options = document.getElementById('clock-options');
+    options.innerHTML = '';
+    const correct = `${clockState.hour}:${clockState.minute === 0 ? '00' : '30'}`;
+    const pool = [];
+    while(pool.length < 2) {
+        let rh = rand(1, 12), rm = Math.random() > 0.5 ? 0 : 30;
+        let val = `${rh}:${rm === 0 ? '00' : '30'}`;
+        if(val !== correct && !pool.includes(val)) pool.push(val);
+    }
+    [correct, ...pool].sort(()=>Math.random()-0.5).forEach(time => {
+        const btn = document.createElement('div');
+        btn.className = 'option'; btn.innerText = time;
+        btn.onclick = () => {
+            if(time === correct) {
+                clockState.score++; clockState.round++;
+                confetti({particleCount:40, spread:60, origin:{y:0.7}});
+                setTimeout(loadClockRound, 800);
+            } else {
+                btn.classList.add('wrong-anim');
+                setTimeout(()=>btn.classList.remove('wrong-anim'), 500);
+            }
+        };
+        options.appendChild(btn);
+    });
+}
+
+function showClockResult() {
+    document.getElementById('clock-container').style.display='none';
+    const res = document.getElementById('result-screen');
+    res.style.display='block';
+    document.getElementById('result-message').innerText = clockState.score === clockState.total ? "시계 박사님 최고예요! 🕰️" : "시계 공부 참 잘했어요! 👍";
+    document.getElementById('score-summary').innerHTML = `${clockState.total}문제 중 <strong>${clockState.score}문제</strong> 성공!`;
+    launchConfetti();
+}
+
+// ════════════════════════════════
+// 크기 비교
+// ════════════════════════════════
+const compState = { round:0, total:10, score:0, vals:[0,0], targetIdx:0 };
+
+function startCompare() {
+    compState.round = 1; compState.score = 0;
+    history.pushState({page:'compare'},'','#compare');
+    document.getElementById('menu-screen').style.display='none';
+    document.getElementById('compare-container').style.display='block';
+    loadCompareRound();
+}
+
+function loadCompareRound() {
+    if(compState.round > compState.total) { showCompareResult(); return; }
+    
+    const isLarger = Math.random() > 0.5;
+    document.getElementById('compare-question-title').innerText = isLarger ? "더 큰 수는?" : "더 작은 수는?";
+    
+    // 천칭 초기화 (수평)
+    const beam = document.getElementById('scale-beam');
+    beam.style.transform = "translateX(-50%) rotate(0deg)";
+    document.querySelector('.scale-pan-left').style.transform = "translateX(-50%) rotate(0deg)";
+    document.querySelector('.scale-pan-right').style.transform = "translateX(50%) rotate(0deg)";
+    document.querySelectorAll('.compare-box').forEach(b => b.classList.remove('correct-heavy'));
+
+    let v1 = rand(1, 30), v2 = rand(1, 30);
+    while(v1 === v2) v2 = rand(1, 30);
+    compState.vals = [v1, v2];
+    compState.targetIdx = isLarger ? (v1 > v2 ? 0 : 1) : (v1 < v2 ? 0 : 1);
+
+    document.getElementById('compare-box-1').innerText = v1;
+    document.getElementById('compare-box-2').innerText = v2;
+    document.getElementById('compare-progress-fill').style.width = ((compState.round-1)/compState.total*100)+'%';
+    document.getElementById('compare-score-display').innerText = `⭐ ${compState.score} / ${compState.round-1}`;
+}
+
+function handleCompare(idx) {
+    if(idx === compState.targetIdx) {
+        compState.score++; compState.round++;
+        
+        // 천칭 기울이기 애니메이션
+        const beam = document.getElementById('scale-beam');
+        const leftPan = document.querySelector('.scale-pan-left');
+        const rightPan = document.querySelector('.scale-pan-right');
+        
+        // 왼쪽이 더 큰 경우 (왼쪽이 내려감 = 시계 반대 방향 회전)
+        const isLeftHeavier = compState.vals[0] > compState.vals[1];
+        const angle = isLeftHeavier ? -15 : 15;
+        
+        beam.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+        leftPan.style.transform = `translateX(-50%) rotate(${-angle}deg)`;
+        rightPan.style.transform = `translateX(50%) rotate(${-angle}deg)`;
+        
+        const heavyBox = document.getElementById(`compare-box-${isLeftHeavier ? 1 : 2}`);
+        heavyBox.classList.add('correct-heavy');
+
+        confetti({particleCount:40, spread:60, origin:{y:0.7}});
+        setTimeout(loadCompareRound, 1500); // 애니메이션을 즐길 수 있도록 시간 연장
+    } else {
+        const el = document.getElementById(`compare-box-${idx+1}`);
+        el.classList.add('wrong-anim');
+        setTimeout(()=>el.classList.remove('wrong-anim'), 500);
+    }
+}
+
+function showCompareResult() {
+    document.getElementById('compare-container').style.display='none';
+    const res = document.getElementById('result-screen');
+    res.style.display='block';
+    document.getElementById('result-message').innerText = "숫자 크기 비교 끝! 대단해요! ⚖️";
+    document.getElementById('score-summary').innerHTML = `${compState.total}문제 중 <strong>${compState.score}문제</strong> 성공!`;
+    launchConfetti();
+}
+
+// ════════════════════════════════
+// 돈 세기
+// ════════════════════════════════
+const moneyState = { round:0, total:5, score:0, totalAmount:0 };
+
+function startMoney() {
+    moneyState.round = 1; moneyState.score = 0;
+    history.pushState({page:'money'},'','#money');
+    document.getElementById('menu-screen').style.display='none';
+    document.getElementById('money-container').style.display='block';
+    loadMoneyRound();
+}
+
+function loadMoneyRound() {
+    if(moneyState.round > moneyState.total) { showMoneyResult(); return; }
+    
+    const tray = document.getElementById('money-tray');
+    tray.innerHTML = '';
+    
+    let sum = 0;
+    const coins = [500, 100, 50, 10];
+    const counts = [rand(0,1), rand(1,4), rand(0,3), rand(0,5)];
+    
+    counts.forEach((count, i) => {
+        for(let c=0; c<count; c++) {
+            const coin = document.createElement('div');
+            coin.className = `coin coin-${coins[i]}`;
+            coin.innerText = coins[i];
+            tray.appendChild(coin);
+            sum += coins[i];
+        }
+    });
+    moneyState.totalAmount = sum;
+
+    document.getElementById('money-progress-fill').style.width = ((moneyState.round-1)/moneyState.total*100)+'%';
+    document.getElementById('money-score-display').innerText = `⭐ ${moneyState.score} / ${moneyState.round-1}`;
+
+    // 보기 생성
+    const options = document.getElementById('money-options');
+    options.innerHTML = '';
+    const correct = sum;
+    const pool = [];
+    while(pool.length < 2) {
+        let val = Math.max(10, sum + (rand(-2, 2) * 10));
+        if(val !== correct && !pool.includes(val)) pool.push(val);
+    }
+    [correct, ...pool].sort(()=>Math.random()-0.5).forEach(amt => {
+        const btn = document.createElement('div');
+        btn.className = 'option'; btn.innerText = amt + "원";
+        btn.onclick = () => {
+            if(amt === correct) {
+                moneyState.score++; moneyState.round++;
+                confetti({particleCount:40, spread:60, origin:{y:0.7}});
+                setTimeout(loadMoneyRound, 800);
+            } else {
+                btn.classList.add('wrong-anim');
+                setTimeout(()=>btn.classList.remove('wrong-anim'), 500);
+            }
+        };
+        options.appendChild(btn);
+    });
+}
+
+function showMoneyResult() {
+    document.getElementById('money-container').style.display='none';
+    const res = document.getElementById('result-screen');
+    res.style.display='block';
+    document.getElementById('result-message').innerText = "부자가 된 기분이에요! 💰";
+    document.getElementById('score-summary').innerHTML = `${moneyState.total}문제 중 <strong>${moneyState.score}문제</strong> 성공!`;
+    launchConfetti();
+}
 
 function nextQuestion() {
     if (state.currentQuestion > state.totalQuestions) { showResult(); return; }
@@ -846,11 +1226,10 @@ function moveClone(e) {
     const {x,y}=getXY(e);
     drag.clone.style.left=(x-drag.offX)+'px';
     drag.clone.style.top =(y-drag.offY)+'px';
-    drag.clone.style.visibility='hidden';
-    const el=document.elementFromPoint(x,y);
-    drag.clone.style.visibility='';
+    
     document.querySelectorAll('.s-slot.drop-hover').forEach(s=>s.classList.remove('drop-hover'));
-    el?.closest('.s-slot:not([data-filled])')?.classList.add('drop-hover');
+    const closest = findClosestSlot(x, y);
+    if(closest) closest.classList.add('drop-hover');
 }
 
 function onUp(e)  {
@@ -865,15 +1244,30 @@ function onTUp(e) {
     drop(e);
 }
 
+function findClosestSlot(x, y) {
+    const slots = document.querySelectorAll('.s-slot:not([data-filled])');
+    let closest = null;
+    let minDistance = 70; // 인식 범위 (픽셀 단위, 충분히 넓게 설정)
+
+    slots.forEach(slot => {
+        const rect = slot.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const dist = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+        if (dist < minDistance) {
+            minDistance = dist;
+            closest = slot;
+        }
+    });
+    return closest;
+}
+
 function drop(e) {
     if(!drag.active||!drag.clone) return;
     const {x,y}=getXY(e);
-    drag.clone.style.visibility='hidden';
-    const el=document.elementFromPoint(x,y);
-    drag.clone.style.visibility='';
     document.querySelectorAll('.s-slot.drop-hover').forEach(s=>s.classList.remove('drop-hover'));
 
-    const slot=el?.closest('.s-slot:not([data-filled])');
+    const slot = findClosestSlot(x, y);
     if(slot){
         const pIdx    = parseInt(slot.dataset.puzzle);
         const pos     = slot.dataset.pos;
@@ -978,3 +1372,4 @@ if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
 
 </body>
 </html>
+>
