@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>지호의 산수 여행</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#003366">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="산수 여행">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --deep-blue: #003366;
+            --bright-text: #F0F8FF;
+            --card-bg: #FFFFFF;
+            --accent-color: #FFD700;
+            --error-color: #FF4D4D;
+            --success-color: #4CAF50;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            margin: 0; padding: 0;
+            background-color: #F5F7FA;
+            color: #333;
+            overflow-x: hidden;
+            display: flex; flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* ── 헤더 ── */
+        header {
+            background-color: var(--deep-blue);
+            color: var(--bright-text);
+            padding: 1.2rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            display: flex; align-items: center; justify-content: center;
+            gap: clamp(0.8rem, 3vw, 2rem);
+        }
+        header h1 {
+            margin: 0;
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            cursor: pointer;              /* 클릭 가능 표시 */
+            user-select: none;
+        }
+        header h1:hover { opacity: 0.85; }
+        .header-paw {
+            height: clamp(70px, 12vw, 110px);
+            pointer-events: none;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+            flex-shrink: 0;
+        }
+
+        /* ── 메인 ── */
+        main {
+            flex: 1;
+            max-width: 720px;
+            margin: 1.5rem auto;
+            padding: 0 1rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* ── 메뉴 4열 ── */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            margin-top: 1.2rem;
+        }
+
+        .activity-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.1rem 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.25s, box-shadow 0.25s;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.09);
+            border: 3px solid transparent;
+        }
+        .activity-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 8px 22px rgba(0,0,0,0.13);
+            border-color: var(--accent-color);
+        }
+        .activity-card h2 {
+            margin: 0.5rem 0 0;
+            font-size: clamp(0.85rem, 2.5vw, 1.1rem);
+            color: var(--deep-blue);
+            word-break: keep-all;
+        }
+        .icon { font-size: clamp(1.8rem, 5vw, 2.6rem); margin-bottom: 0.1rem; display: block; }
+
+        /* 제작 중 카드 */
+        .card-wip {
+            opacity: 0.45;
+            cursor: default;
+            pointer-events: none;
+        }
+        .card-wip h2 { color: #888; }
+
+        /* ── 기존 게임 화면 ── */
+        #game-container {
+            display: none;
+            background: white; border-radius: 24px;
+            padding: 1.5rem 1.5rem 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .game-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        .back-btn {
+            padding: 8px 16px;
+            background: var(--deep-blue); color: white;
+            border: none; border-radius: 10px;
+            cursor: pointer; font-family: inherit; font-size: 0.95rem; white-space: nowrap;
+        }
+        #score-display, #spider-score-display {
+            font-size: 1.1rem; font-weight: bold; color: var(--deep-blue);
+        }
+        .progress-bar {
+            width: 100%; height: 10px; background: #EEE;
+            border-radius: 5px; margin-bottom: 1rem; overflow: hidden;
+        }
+        .progress-fill { height: 100%; background: var(--success-color); width: 0%; transition: width 0.3s; }
+
+        #question-text, #spider-question-text {
+            font-size: clamp(1rem, 3vw, 1.3rem); color: #666; margin-bottom: 0;
+        }
+        .question-area {
+            display: flex; align-items: center; justify-content: center;
+            flex-wrap: wrap; gap: clamp(0.6rem, 2vw, 1.5rem);
+            font-size: clamp(2rem, 8vw, 4rem); font-weight: bold;
+            margin: 1.5rem 0; color: var(--deep-blue);
+        }
+        .blank {
+            width: clamp(60px, 15vw, 100px); height: clamp(60px, 15vw, 100px);
+            border-bottom: 6px solid var(--deep-blue);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--success-color);
+        }
+        .options-area {
+            display: flex; justify-content: center;
+            gap: clamp(0.8rem, 3vw, 2rem); margin-top: 1.5rem;
+        }
+        .option {
+            width: clamp(65px, 18vw, 90px); height: clamp(65px, 18vw, 90px);
+            background: var(--bright-text); border: 4px solid var(--deep-blue);
+            border-radius: 15px; display: flex; align-items: center; justify-content: center;
+            font-size: clamp(1.5rem, 5vw, 2.5rem); cursor: pointer;
+            transition: all 0.2s; user-select: none; font-family: inherit; font-weight: bold;
+        }
+        .option:hover { background: white; transform: scale(1.1); }
+        .option.wrong-anim {
+            background-color: var(--error-color) !important; color: white !important;
+            animation: shake 0.5s;
+        }
+        @keyframes shake {
+            0%,100%{transform:translateX(0)} 25%{transform:translateX(-10px)}
+            50%{transform:translateX(10px)} 75%{transform:translateX(-10px)}
+        }
+
+        /* ── 결과 화면 공통 ── */
+        #result-screen, #spider-result-screen {
+            display: none; text-align: center; padding: 2rem 1rem;
+        }
+        #result-screen h2, #spider-result-screen h2 {
+            font-size: clamp(2rem,7vw,3rem); color: var(--deep-blue); margin-bottom: 0.5rem;
+        }
+        #result-message, #spider-result-message { font-size: clamp(1.1rem,4vw,1.5rem); margin-bottom: 0.5rem; }
+        #score-summary, #spider-score-summary {
+            font-size: clamp(1.3rem,5vw,2rem); font-weight: bold;
+            color: var(--deep-blue); margin: 1rem 0 1.5rem;
+        }
+        .reset-btn {
+            margin: 0.5rem; padding: 0.9rem 2rem;
+            font-size: clamp(1rem,4vw,1.4rem);
+            background: var(--success-color); color: white;
+            border: none; border-radius: 15px; cursor: pointer;
+            transition: transform 0.2s; font-family: inherit;
+        }
+        .reset-btn:hover { transform: scale(1.05); }
+
+        /* ══════════════════════════════
+           거미 더하기
+        ══════════════════════════════ */
+        #spider-container {
+            display: none;
+            background: white; border-radius: 24px;
+            padding: 1.2rem 1rem 1.8rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        /*
+         * 문제 구조 (한 거미줄):
+         *
+         *  [11시 ← 제공]    [1시 ← 빈칸]
+         *        ╲          ╱
+         *          [중앙숫자]
+         *        ╱          ╲
+         *  [7시 ← 제공]    [5시 ← 빈칸]
+         *
+         *  대각선 쌍:  11시 + 5시 = 중앙
+         *              1시  + 7시 = 중앙
+         *
+         *  → 아이가 구해야 할 값:
+         *      1시  = 중앙 − 7시값
+         *      5시  = 중앙 − 11시값
+         */
+
+        /* 두 거미줄 나란히 */
+        .spider-puzzles {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: clamp(1.2rem, 4vw, 3rem);
+            margin: 0.9rem 0 0.5rem;
+        }
+
+        /* 개별 거미줄 컨테이너 */
+        .spider-wrap {
+            --sp: min(180px, 38vw);
+            --cr: calc(var(--sp) * 0.27);    /* 코너 원 지름 */
+            --cc: calc(var(--sp) * 0.31);    /* 중앙 원 지름 */
+            position: relative;
+            width: var(--sp);
+            height: var(--sp);
+            flex-shrink: 0;
+        }
+
+        /* SVG 선 */
+        .spider-svg {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+        }
+
+        /* 중앙 원 */
+        .s-center {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: var(--cc); height: var(--cc);
+            border-radius: 50%;
+            background: var(--deep-blue); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: clamp(1.3rem, 4.5vw, 2rem); font-weight: 900;
+            z-index: 2;
+            box-shadow: 0 3px 12px rgba(0,0,102,0.3);
+            pointer-events: none;
+        }
+
+        /* 코너 원 공통 */
+        .s-circle {
+            position: absolute;
+            width: var(--cr); height: var(--cr);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: clamp(1rem, 3.5vw, 1.5rem); font-weight: bold;
+            z-index: 2;
+        }
+
+        /* 제공 원 (11시·7시) — 숫자 미리 표시 */
+        .s-given {
+            border: 3px solid #99a;
+            background: #e8ecf8;
+            color: var(--deep-blue);
+        }
+
+        /* 빈칸 원 (1시·5시) — 드롭 대상 */
+        .s-slot {
+            border: 3px dashed #bbb;
+            background: #f8f8f8;
+            color: var(--success-color);
+            transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+        }
+        .s-slot.drop-hover {
+            border-color: var(--accent-color); border-style: solid;
+            background: #fffde7;
+            box-shadow: 0 0 0 4px rgba(255,215,0,0.35);
+        }
+        .s-slot.filled {
+            border-color: var(--success-color); border-style: solid;
+            background: #e8f5e9; color: var(--deep-blue);
+        }
+
+        /* 코너 위치 (transform 없이, 단순 corner 배치) */
+        .clock-11 { top: 0;    left: 0;    }
+        .clock-1  { top: 0;    right: 0;   }
+        .clock-5  { bottom: 0; right: 0;   }
+        .clock-7  { bottom: 0; left: 0;    }
+
+        /* 힌트 버튼 */
+        .hint-row {
+            display: flex; justify-content: center;
+            margin: 0.6rem 0 0.2rem;
+        }
+        .hint-btn {
+            padding: 7px 22px;
+            background: #fff3cd; color: #856404;
+            border: 2px solid #ffc107; border-radius: 20px;
+            font-family: inherit; font-size: 0.95rem; font-weight: bold;
+            cursor: pointer; transition: background 0.15s, transform 0.15s;
+        }
+        .hint-btn:hover { background: #ffe69c; transform: scale(1.04); }
+        .hint-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
+
+        /* 힌트 표시된 슬롯 */
+        .s-slot.hint-shown {
+            border-style: solid; border-color: #ffc107;
+            background: #fff9e6;
+            opacity: 0.55;              /* 50% 투명 느낌 */
+            color: var(--deep-blue);
+            pointer-events: none;       /* 힌트칸엔 드롭 불가 */
+        }
+
+        /* 숫자 뱅크 (정답 4개 — 1행) */
+        .number-bank {
+            display: flex; justify-content: center; flex-wrap: nowrap;
+            gap: clamp(0.6rem, 2.5vw, 1rem);
+            margin: 0.5rem auto 0;
+        }
+        .bank-tile {
+            /* 원형 */
+            width: clamp(58px, 14vw, 72px); height: clamp(58px, 14vw, 72px);
+            border-radius: 50%;
+            border: 3px solid var(--deep-blue);
+            background: var(--bright-text);
+            display: flex; align-items: center; justify-content: center;
+            font-size: clamp(1.2rem, 4.5vw, 1.8rem); font-weight: bold; color: var(--deep-blue);
+            cursor: grab; user-select: none; touch-action: none;
+            transition: opacity 0.15s, transform 0.15s; font-family: inherit;
+            box-shadow: 0 2px 8px rgba(0,0,102,0.12);
+        }
+        .bank-tile:hover { transform: scale(1.1); background: white; }
+        .bank-tile.dragging-source { opacity: 0.22; }
+        .bank-tile.used { opacity: 0; pointer-events: none; }
+
+        /* 드래그 클론 (원형) */
+        .drag-clone {
+            position: fixed;
+            border-radius: 50%; border: 3px solid var(--deep-blue);
+            background: var(--bright-text);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; color: var(--deep-blue);
+            z-index: 9999; pointer-events: none;
+            transform: scale(1.18);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .drag-clone.wrong-shake {
+            background: var(--error-color) !important;
+            color: white !important; border-color: var(--error-color) !important;
+            animation: spiderShake 0.45s forwards;
+        }
+        @keyframes spiderShake {
+            0%,100%{transform:scale(1.18) translateX(0)}
+            25%{transform:scale(1.18) translateX(-14px)}
+            50%{transform:scale(1.18) translateX(14px)}
+            75%{transform:scale(1.18) translateX(-14px)}
+        }
+
+        footer {
+            padding: 1.5rem; text-align: center; color: #888; font-size: 0.9rem;
+        }
+
+        /* ── 거미 바디 래퍼: 기본(세로) ── */
+        .spider-body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        /* 세로모드: spider-right는 투명 래퍼 — 자식이 spider-body 플렉스에 직접 참여 */
+        .spider-right { display: contents; }
+
+        /* ══════════════════════════════════════════════
+           ① 가로 모드 공통 — 태블릿·폰 모두 적용
+              (Galaxy Tab S6 landscape ≈ 1280×800 CSS px 포함)
+        ══════════════════════════════════════════════ */
+        @media (orientation: landscape) {
+            /* 헤더: 이미지 높이를 vh 기준으로 축소해 세로 공간 확보 */
+            header { padding: 0.4rem 1.5rem; }
+            header h1 { font-size: min(1.9rem, 5.5vh); }
+            .header-paw { height: min(60px, 9vh); }
+
+            /* 푸터 숨김 */
+            footer { display: none; }
+
+            /* main 상하 여백 축소 */
+            main { margin: 0.4rem auto; }
+
+            /* 거미 컨테이너 상하 패딩 축소 */
+            #spider-container { padding: 0.6rem 1rem 0.8rem; }
+
+            /* 거미줄 크기: vh 기준 (가로모드 높이에 맞춤) */
+            .spider-wrap { --sp: min(180px, 26vh); }
+
+            /* 거미줄 사이 여백 축소 */
+            .spider-puzzles { margin: 0.5rem 0 0.3rem; }
+
+            /* 힌트 버튼 여백 축소 */
+            .hint-row { margin: 0.3rem 0 0.1rem; }
+
+            /* 뱅크 타일 크기: vh 기준 */
+            .bank-tile {
+                width:  min(70px, 12vh);
+                height: min(70px, 12vh);
+                font-size: min(1.7rem, 4.5vh);
+            }
+
+            /* 기존 4종 게임도 compact */
+            #game-container { padding: 0.8rem 1.5rem 1rem; }
+            .question-area { margin: 0.6rem 0; font-size: min(3.5rem, 10vh); }
+            .blank { width: min(90px, 14vh); height: min(90px, 14vh); }
+            .options-area { margin-top: 0.8rem; }
+            .option { width: min(85px, 14vh); height: min(85px, 14vh); font-size: min(2.2rem, 6vh); }
+        }
+
+        /* ══════════════════════════════════════════════
+           ② 가로 모드 + 작은 화면 — 폰 전용 레이아웃
+              (height ≤ 540px: iPhone landscape 등)
+              거미줄 왼쪽 / 힌트+숫자 오른쪽
+        ══════════════════════════════════════════════ */
+        @media (orientation: landscape) and (max-height: 540px) {
+            header { padding: 0.25rem 1rem; }
+            header h1 { font-size: min(1.1rem, 4vh); }
+            .header-paw { height: min(38px, 8vh); }
+            main { margin: 0.2rem auto; }
+            #spider-container { padding: 0.4rem 0.7rem 0.5rem; }
+
+            /* 거미줄+뱅크 가로 배치 */
+            .spider-body {
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                gap: clamp(0.8rem, 2.5vw, 2rem);
+                margin-top: 0.1rem;
+            }
+            .spider-right {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.4rem;
+            }
+            .spider-wrap { --sp: min(110px, 22vh); }
+            .spider-puzzles { margin: 0; gap: clamp(0.6rem, 1.5vw, 1rem); }
+            .hint-row { margin: 0; }
+
+            /* 숫자: 2×2 격자 */
+            .number-bank {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.4rem;
+                margin: 0;
+                max-width: unset;
+            }
+            .bank-tile {
+                width:  min(48px, 10vh);
+                height: min(48px, 10vh);
+                font-size: min(1.1rem, 3.5vh);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="cat.png" class="header-paw" alt="cat">
+    <h1 onclick="showMenu()">지호의 산수 여행</h1>
+    <img src="pngfind.com-sad-pepe-png-72825.png" class="header-paw" alt="">
+</header>
+
+<main>
+    <!-- 메뉴 (4열 × 2행 = 8칸) -->
+    <div id="menu-screen">
+        <div class="menu-grid">
+            <div class="activity-card" onclick="startGame('add')">
+                <span class="icon">➕</span>
+                <h2>더하기</h2>
+            </div>
+            <div class="activity-card" onclick="startGame('sub')">
+                <span class="icon">➖</span>
+                <h2>빼기</h2>
+            </div>
+            <div class="activity-card" onclick="startGame('mul')">
+                <span class="icon">✖️</span>
+                <h2>곱하기</h2>
+            </div>
+            <div class="activity-card" onclick="startGame('div')">
+                <span class="icon">➗</span>
+                <h2>나누기</h2>
+            </div>
+            <div class="activity-card" onclick="startSpider()">
+                <span class="icon">🕷️</span>
+                <h2>거미 더하기</h2>
+            </div>
+            <div class="activity-card card-wip">
+                <span class="icon">🔧</span>
+                <h2>제작 중</h2>
+            </div>
+            <div class="activity-card card-wip">
+                <span class="icon">🔧</span>
+                <h2>제작 중</h2>
+            </div>
+            <div class="activity-card card-wip">
+                <span class="icon">🔧</span>
+                <h2>제작 중</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- 기존 게임 화면 -->
+    <div id="game-container">
+        <div class="game-header">
+            <button class="back-btn" onclick="goHome()">🏠 처음으로</button>
+            <div id="score-display">⭐ 0 / 0</div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        <div id="question-text">질문 1 / 10</div>
+        <div class="question-area">
+            <span id="num1">0</span>
+            <span id="operator">+</span>
+            <span id="num2">0</span>
+            <span>=</span>
+            <div class="blank" id="answer-blank"></div>
+        </div>
+        <div class="options-area" id="options-container"></div>
+    </div>
+
+    <!-- 기존 결과 화면 -->
+    <div id="result-screen">
+        <h2>🎉 여행 완료! 🎉</h2>
+        <p id="result-message"></p>
+        <div id="score-summary"></div>
+        <button class="reset-btn" onclick="goHome()">한 번 더 하기</button>
+    </div>
+
+    <!-- 거미 더하기 게임 화면 -->
+    <div id="spider-container">
+        <div class="game-header">
+            <button class="back-btn" onclick="goHome()">🏠 처음으로</button>
+            <div id="spider-score-display">⭐ 0 / 0</div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="spider-progress-fill"></div></div>
+        <div id="spider-question-text">문제 1 / 5</div>
+
+        <!-- 세로: 거미줄 위 / 힌트+뱅크 아래
+             가로: 거미줄 왼쪽 / 힌트+뱅크 오른쪽 -->
+        <div class="spider-body">
+            <div class="spider-puzzles" id="spider-puzzles"></div>
+
+            <!-- 가로모드에서 오른쪽 열이 됨 -->
+            <div class="spider-right">
+                <div class="hint-row">
+                    <button class="hint-btn" id="hint-btn" onclick="showHint()">💡 힌트</button>
+                </div>
+                <div class="number-bank" id="number-bank"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 거미 결과 화면 -->
+    <div id="spider-result-screen">
+        <h2>🕷️ 거미 여행 완료! 🕷️</h2>
+        <p id="spider-result-message"></p>
+        <div id="spider-score-summary"></div>
+        <button class="reset-btn" onclick="replaySpider()">한 번 더 하기</button>
+    </div>
+</main>
+
+<footer>
+    &copy; 2026 지호의 산수 여행. 만 6세를 위한 즐거운 수학 시간!
+</footer>
+
+<script>
+// ════════════════════════════════
+// 기존 4종 게임
+// ════════════════════════════════
+const state = {
+    mode:'', currentQuestion:0, totalQuestions:10,
+    correctAnswer:0, score:0, isProcessing:false,
+};
+
+history.replaceState({ page:'home' }, '');
+
+function startGame(mode) {
+    state.mode = mode;
+    state.currentQuestion = 1;
+    state.score = 0;
+    state.isProcessing = false;
+    history.pushState({ page:'game' }, '', '#game');
+    ['result-screen'].forEach(id => { document.getElementById(id).style.display='none'; });
+    document.getElementById('menu-screen').style.display = 'none';
+    document.getElementById('game-container').style.display = 'block';
+    nextQuestion();
+}
+
+function showMenu() {
+    ['game-container','result-screen','spider-container','spider-result-screen']
+        .forEach(id => { document.getElementById(id).style.display = 'none'; });
+    document.getElementById('menu-screen').style.display = 'block';
+}
+
+function goHome() { history.back(); }
+window.addEventListener('popstate', e => { if (!e.state || e.state.page==='home') showMenu(); });
+
+function nextQuestion() {
+    if (state.currentQuestion > state.totalQuestions) { showResult(); return; }
+    state.isProcessing = false;
+    document.getElementById('progress-fill').style.width =
+        ((state.currentQuestion-1)/state.totalQuestions*100)+'%';
+    document.getElementById('question-text').innerText =
+        `질문 ${state.currentQuestion} / ${state.totalQuestions}`;
+    document.getElementById('answer-blank').innerText = '';
+    document.getElementById('score-display').innerText =
+        `⭐ ${state.score} / ${state.currentQuestion-1}`;
+
+    let n1,n2,opText;
+    switch(state.mode){
+        case'add': n1=rand(1,10); n2=rand(1,10); state.correctAnswer=n1+n2; opText='➕'; break;
+        case'sub': n1=rand(5,15); n2=rand(1,n1-1); state.correctAnswer=n1-n2; opText='➖'; break;
+        case'mul': n1=rand(1,5);  n2=rand(1,5);  state.correctAnswer=n1*n2; opText='✖️'; break;
+        case'div': n2=rand(1,4); state.correctAnswer=rand(1,Math.floor(20/n2)); n1=state.correctAnswer*n2; opText='➗'; break;
+    }
+    document.getElementById('num1').innerText=n1;
+    document.getElementById('num2').innerText=n2;
+    document.getElementById('operator').innerText=opText;
+    generateOptions();
+}
+
+function generateOptions() {
+    const container = document.getElementById('options-container');
+    container.innerHTML='';
+    const correct=state.correctAnswer;
+    const pool=[];
+    for(let v=Math.max(0,correct-10);v<=correct+10;v++) if(v!==correct) pool.push(v);
+    shuffleArr(pool);
+    [correct,pool[0],pool[1]].sort(()=>Math.random()-0.5).forEach(val=>{
+        const btn=document.createElement('div');
+        btn.className='option'; btn.innerText=val;
+        btn.onclick=()=>handleChoice(btn,val);
+        container.appendChild(btn);
+    });
+}
+
+function handleChoice(element, value) {
+    if(state.isProcessing) return;
+    if(value===state.correctAnswer){
+        state.isProcessing=true; state.score++;
+        const blank=document.getElementById('answer-blank');
+        const sr=element.getBoundingClientRect(), er=blank.getBoundingClientRect();
+        element.style.transition='transform 0.6s cubic-bezier(0.175,0.885,0.32,1.275)';
+        element.style.transform=`translate(${er.left-sr.left+(er.width-sr.width)/2}px,${er.top-sr.top+(er.height-sr.height)/2}px)`;
+        element.style.zIndex='1000';
+        setTimeout(()=>{
+            blank.innerText=state.correctAnswer; element.remove();
+            setTimeout(()=>{ state.currentQuestion++; nextQuestion(); },800);
+        },600);
+    } else {
+        element.classList.add('wrong-anim');
+        setTimeout(()=>element.classList.remove('wrong-anim'),500);
+    }
+}
+
+function showResult() {
+    document.getElementById('game-container').style.display='none';
+    document.getElementById('result-screen').style.display='block';
+    const total=state.totalQuestions, score=state.score;
+    const stars=score===total?'🌟🌟🌟':score>=total*0.7?'⭐⭐':'⭐';
+    document.getElementById('result-message').innerText=
+        score===total?'완벽해요! 모두 맞혔어요! 대단해요! 🥳':
+        score>=total*0.7?'잘 했어요! 조금만 더 연습하면 완벽해질 거예요! 💪':
+        '잘 도전했어요! 다시 한 번 해볼까요? 🌱';
+    document.getElementById('score-summary').innerHTML=
+        `${stars}<br>${total}문제 중 <strong>${score}문제</strong> 맞혔어요!`;
+    launchConfetti();
+}
+
+// ════════════════════════════════
+// 거미 더하기
+//
+// 한 라운드 = 거미줄 2개 나란히
+// 각 거미줄:
+//   - 11시(TL), 7시(BL) 숫자 제공
+//   - 1시(TR), 5시(BR) 빈칸 → 아이가 채움
+//   대각선 쌍: 11+5=center, 1+7=center
+//   따라서  ans_1 = center − g7
+//            ans_5 = center − g11
+//
+// 뱅크: 두 문제의 정답 4개만 섞어서 제시
+// (오답 없음 — 어디에 넣어야 하는지 판단이 핵심)
+// ════════════════════════════════
+const sS = { round:0, totalRounds:5, score:0, puzzles:[], filled:0 };
+const drag = { active:false, tile:null, clone:null, value:0, offX:0, offY:0 };
+
+function startSpider() {
+    sS.round=1; sS.score=0;
+    history.pushState({page:'spider'},'','#spider');
+    document.getElementById('menu-screen').style.display='none';
+    document.getElementById('spider-result-screen').style.display='none';
+    document.getElementById('spider-container').style.display='block';
+    loadSpiderRound();
+}
+
+function replaySpider() {
+    sS.round=1; sS.score=0;
+    document.getElementById('spider-result-screen').style.display='none';
+    document.getElementById('spider-container').style.display='block';
+    loadSpiderRound();
+}
+
+function makePuzzle() {
+    const center = rand(7,16);
+    const g11    = rand(1, center-1);
+    let   g7     = rand(1, center-1);
+    for(let t=0; t<15 && g7===g11; t++) g7=rand(1,center-1);
+    return {
+        center,
+        g11,               // 11시 제공값
+        g7,                // 7시 제공값
+        ans1: center - g7, // 1시 정답  (1+7=center)
+        ans5: center - g11,// 5시 정답  (11+5=center)
+    };
+}
+
+function loadSpiderRound() {
+    sS.filled = 0;
+    sS.puzzles = [makePuzzle(), makePuzzle()];
+
+    // 힌트 버튼 초기화
+    document.getElementById('hint-btn').disabled = false;
+
+    // 상단 표시
+    document.getElementById('spider-question-text').textContent =
+        `문제 ${sS.round} / ${sS.totalRounds}`;
+    document.getElementById('spider-progress-fill').style.width =
+        ((sS.round-1)/sS.totalRounds*100)+'%';
+    document.getElementById('spider-score-display').textContent =
+        `⭐ ${sS.score} / ${sS.round-1}`;
+
+    // ── 두 거미줄 렌더링 ──
+    // 원 크기(--cr)의 절반이 코너에서의 중심 오프셋
+    // SVG 선: 각 원의 중심을 잇는다
+    // --cr = 27% of --sp → 중심 위치 = 13.5% from edge
+    const pct = 13.5;
+    const wrap = document.getElementById('spider-puzzles');
+    wrap.innerHTML = '';
+
+    sS.puzzles.forEach((p, idx) => {
+        const div = document.createElement('div');
+        div.className = 'spider-wrap';
+        // 인라인 스타일로 --sp CSS var 확인용 데이터 저장
+        div.innerHTML = `
+            <svg class="spider-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <line x1="${pct}" y1="${pct}" x2="${100-pct}" y2="${100-pct}"
+                      stroke="#ccc" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="${100-pct}" y1="${pct}" x2="${pct}" y2="${100-pct}"
+                      stroke="#ccc" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+            <div class="s-center">${p.center}</div>
+            <div class="s-circle s-given clock-11">${p.g11}</div>
+            <div class="s-circle s-slot  clock-1"  data-puzzle="${idx}" data-pos="1"></div>
+            <div class="s-circle s-slot  clock-5"  data-puzzle="${idx}" data-pos="5"></div>
+            <div class="s-circle s-given clock-7">${p.g7}</div>
+        `;
+        wrap.appendChild(div);
+    });
+
+    // ── 정답 4개 뱅크 ──
+    const answers = [sS.puzzles[0].ans1, sS.puzzles[0].ans5,
+                     sS.puzzles[1].ans1, sS.puzzles[1].ans5];
+    shuffleArr(answers);
+
+    const bank = document.getElementById('number-bank');
+    bank.innerHTML = '';
+    answers.forEach((val, i) => {
+        const tile = document.createElement('div');
+        tile.className  = 'bank-tile';
+        tile.dataset.value    = val;
+        tile.dataset.bankIdx  = i;
+        tile.textContent = val;
+        tile.addEventListener('mousedown', tileDown);
+        tile.addEventListener('touchstart', tileTouch, {passive:false});
+        bank.appendChild(tile);
+    });
+}
+
+// ── 드래그 & 드롭 ──
+function getXY(e) {
+    if(e.touches?.length)        return {x:e.touches[0].clientX,        y:e.touches[0].clientY};
+    if(e.changedTouches?.length) return {x:e.changedTouches[0].clientX, y:e.changedTouches[0].clientY};
+    return {x:e.clientX, y:e.clientY};
+}
+
+function tileDown(e) {
+    if(e.button!==0) return;
+    beginDrag(e, e.currentTarget);
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup',   onUp);
+}
+function tileTouch(e) {
+    e.preventDefault();
+    beginDrag(e, e.currentTarget);
+    document.addEventListener('touchmove',  onTMove, {passive:false});
+    document.addEventListener('touchend',   onTUp);
+    document.addEventListener('touchcancel',onTUp);
+}
+
+function beginDrag(e, tile) {
+    if(drag.active || tile.classList.contains('used')) return;
+    drag.active = true;
+    drag.tile   = tile;
+    drag.value  = parseInt(tile.dataset.value);
+    const {x,y} = getXY(e);
+    const r = tile.getBoundingClientRect();
+    drag.offX = x-r.left; drag.offY = y-r.top;
+
+    const cl = document.createElement('div');
+    cl.className   = 'drag-clone';
+    cl.textContent = drag.value;
+    cl.style.width  = r.width+'px';
+    cl.style.height = r.height+'px';
+    cl.style.fontSize = getComputedStyle(tile).fontSize;
+    cl.style.left = r.left+'px';
+    cl.style.top  = r.top+'px';
+    document.body.appendChild(cl);
+    drag.clone = cl;
+    tile.classList.add('dragging-source');
+}
+
+function onMove(e)  { moveClone(e); }
+function onTMove(e) { e.preventDefault(); moveClone(e); }
+
+function moveClone(e) {
+    if(!drag.active||!drag.clone) return;
+    const {x,y}=getXY(e);
+    drag.clone.style.left=(x-drag.offX)+'px';
+    drag.clone.style.top =(y-drag.offY)+'px';
+    drag.clone.style.visibility='hidden';
+    const el=document.elementFromPoint(x,y);
+    drag.clone.style.visibility='';
+    document.querySelectorAll('.s-slot.drop-hover').forEach(s=>s.classList.remove('drop-hover'));
+    el?.closest('.s-slot:not([data-filled])')?.classList.add('drop-hover');
+}
+
+function onUp(e)  {
+    document.removeEventListener('mousemove',onMove);
+    document.removeEventListener('mouseup',  onUp);
+    drop(e);
+}
+function onTUp(e) {
+    document.removeEventListener('touchmove',  onTMove);
+    document.removeEventListener('touchend',   onTUp);
+    document.removeEventListener('touchcancel',onTUp);
+    drop(e);
+}
+
+function drop(e) {
+    if(!drag.active||!drag.clone) return;
+    const {x,y}=getXY(e);
+    drag.clone.style.visibility='hidden';
+    const el=document.elementFromPoint(x,y);
+    drag.clone.style.visibility='';
+    document.querySelectorAll('.s-slot.drop-hover').forEach(s=>s.classList.remove('drop-hover'));
+
+    const slot=el?.closest('.s-slot:not([data-filled])');
+    if(slot){
+        const pIdx    = parseInt(slot.dataset.puzzle);
+        const pos     = slot.dataset.pos;
+        const expected= pos==='1' ? sS.puzzles[pIdx].ans1 : sS.puzzles[pIdx].ans5;
+
+        if(drag.value===expected){
+            // ✅ 정답
+            slot.textContent = drag.value;
+            slot.setAttribute('data-filled','true');
+            slot.classList.remove('hint-shown');
+            slot.classList.add('filled');
+            drag.tile.classList.remove('dragging-source');
+            drag.tile.classList.add('used');
+            drag.clone.remove(); drag.clone=null;
+            drag.active=false; drag.tile=null;
+            sS.filled++;
+            // 힌트로 표시된 슬롯도 카운트에 포함해 4개 완성 체크
+            const hintCount = document.querySelectorAll('.s-slot.hint-shown').length;
+            if(sS.filled + hintCount >= 4) onRoundComplete();
+            return;
+        } else {
+            // ❌ 오답 — 빨간 떨림
+            drag.clone.classList.add('wrong-shake');
+            drag.tile.classList.remove('dragging-source');
+            const ref=drag.clone;
+            drag.clone=null; drag.active=false; drag.tile=null;
+            setTimeout(()=>ref.remove(), 460);
+            return;
+        }
+    }
+    // 빈 공간 드롭 — 원위치
+    drag.tile.classList.remove('dragging-source');
+    drag.clone.remove(); drag.clone=null;
+    drag.active=false; drag.tile=null;
+}
+
+function showHint() {
+    // 아직 채워지지 않은 슬롯 중 힌트가 표시되지 않은 것만 대상
+    const emptySlots = [...document.querySelectorAll(
+        '.s-slot:not([data-filled]):not(.hint-shown)'
+    )];
+    if (emptySlots.length === 0) return;
+
+    // 무작위 1개 선택
+    const slot = emptySlots[Math.floor(Math.random() * emptySlots.length)];
+    const pIdx = parseInt(slot.dataset.puzzle);
+    const pos  = slot.dataset.pos;
+    const ans  = pos === '1' ? sS.puzzles[pIdx].ans1 : sS.puzzles[pIdx].ans5;
+
+    slot.textContent = ans;
+    slot.classList.add('hint-shown');
+
+    // 힌트 후 남은 빈 칸 없으면 버튼 비활성화
+    const remaining = document.querySelectorAll(
+        '.s-slot:not([data-filled]):not(.hint-shown)'
+    );
+    if (remaining.length === 0) {
+        document.getElementById('hint-btn').disabled = true;
+    }
+}
+
+function onRoundComplete() {
+    sS.score++;
+    confetti({particleCount:55, spread:70, origin:{y:0.55},
+              colors:['#003366','#FFD700','#4CAF50']});
+    setTimeout(()=>{
+        if(sS.round>=sS.totalRounds){ showSpiderResult(); }
+        else { sS.round++; loadSpiderRound(); }
+    }, 900);
+}
+
+function showSpiderResult() {
+    document.getElementById('spider-container').style.display='none';
+    document.getElementById('spider-result-screen').style.display='block';
+    const total=sS.totalRounds, score=sS.score;
+    const stars=score===total?'🌟🌟🌟':score>=total*0.6?'⭐⭐':'⭐';
+    document.getElementById('spider-result-message').textContent=
+        score===total?'완벽해요! 모두 맞혔어요! 대단해요! 🥳':
+        score>=total*0.6?'잘 했어요! 💪':'다시 한 번 해볼까요? 🌱';
+    document.getElementById('spider-score-summary').innerHTML=
+        `${stars}<br>${total}라운드 중 <strong>${score}라운드</strong> 성공!`;
+    launchConfetti();
+}
+
+// ════ 공통 유틸 ════
+function rand(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function shuffleArr(a){
+    for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+    return a;
+}
+function launchConfetti(){
+    const end=Date.now()+3000;
+    (function f(){
+        confetti({particleCount:3,angle:60, spread:55,origin:{x:0},colors:['#003366','#FFD700','#4CAF50']});
+        confetti({particleCount:3,angle:120,spread:55,origin:{x:1},colors:['#003366','#FFD700','#4CAF50']});
+        if(Date.now()<end) requestAnimationFrame(f);
+    }());
+}
+
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
+</script>
+
+</body>
+</html>
