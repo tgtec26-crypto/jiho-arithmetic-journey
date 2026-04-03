@@ -1,6 +1,5 @@
 {
-  "name": "jiho-arithmetic-journey",
   "version": 2,
   "cleanUrls": true,
-  "framework": null
+  "framework": "sveltekit"
 }
