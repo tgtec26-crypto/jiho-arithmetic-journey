@@ -6,7 +6,8 @@ export type GameMode =
   | 'spider' 
   | 'clock' 
   | 'compare' 
-  | 'money' 
+  | 'money'
+  | 'train'
   | 'menu';
 
 export interface Question {

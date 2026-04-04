@@ -19,6 +19,7 @@
   let tilt = $state(0); 
   let targetIdx = $state(0);
   let errorIdx = $state<number | null>(null); 
+  let wrongCount = $state(0);
   let confettiRef: any = $state();
   
   const TOTAL_ROUNDS = 5;
@@ -60,6 +61,7 @@
     showSums = false;
     tilt = 0;
     errorIdx = null;
+    wrongCount = 0;
     round += 1;
     gameStore.updateProgress(round - 1, TOTAL_ROUNDS);
   }
@@ -71,6 +73,7 @@
       isChecking = true;
       showSums = true;
       errorIdx = null;
+      
       const isLeftHeavier = leftPair.sum > rightPair.sum;
       tilt = isLeftHeavier ? -12 : 12;
 
@@ -80,7 +83,11 @@
       setTimeout(nextQuestion, 2500);
     } else {
       errorIdx = idx;
+      wrongCount += 1;
       feedback = '다시 한번 더해볼까요? 🧐';
+      if (wrongCount === 2) {
+        gameStore.subtractScore(10);
+      }
       setTimeout(() => {
         errorIdx = null;
         feedback = '';
@@ -100,24 +107,17 @@
   </div>
 
   <div class="scale-area relative w-full h-[500px] flex flex-col items-center justify-end overflow-visible">
-    
-    <!-- 천칭 기둥 -->
     <div class="scale-pillar absolute top-[100px] left-1/2 -translate-x-1/2 w-8 h-[350px] bg-[#8D6E63] rounded-full shadow-lg z-10">
         <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[220px] h-10 bg-[#5D4037] rounded-t-2xl shadow-xl"></div>
     </div>
 
-    <!-- 가로대 통합 컨테이너 -->
     <div 
       class="absolute top-[60px] left-1/2 w-[450px] sm:w-[600px] h-10 transition-transform duration-[1200ms] ease-[cubic-bezier(0.4,0,0.2,1)] z-20 origin-center"
       style="transform: translateX(-50%) rotate({tilt}deg)"
     >
-      <!-- 가로대 나무 막대 (실보다 위에 오도록 z-20) -->
       <div class="absolute top-1/2 left-0 w-full h-4 bg-[#A1887F] rounded-full -translate-y-1/2 shadow-md z-20"></div>
-
-      <!-- 중앙 축 (가장 위 z-40) -->
       <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 bg-[#FFD700] border-4 border-[#8D6E63] rounded-full shadow-md z-40"></div>
 
-      <!-- 왼쪽 세트 (실이 막대 아래에서 시작하도록 top 설정) -->
       <div class="absolute left-6 top-5 w-[150px] flex flex-col items-center transition-transform duration-[1200ms] ease-[cubic-bezier(0.4,0,0.2,1)] origin-top z-10"
            style="transform: translateX(-50%) rotate({-tilt}deg)">
         <div class="w-0.5 h-20 bg-[#9E9E9E]"></div>
@@ -137,7 +137,6 @@
         </button>
       </div>
 
-      <!-- 오른쪽 세트 -->
       <div class="absolute right-6 top-5 w-[150px] flex flex-col items-center transition-transform duration-[1200ms] ease-[cubic-bezier(0.4,0,0.2,1)] origin-top z-10"
            style="transform: translateX(50%) rotate({-tilt}deg)">
         <div class="w-0.5 h-20 bg-[#9E9E9E]"></div>

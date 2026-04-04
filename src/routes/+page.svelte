@@ -12,6 +12,7 @@
   import CompareGame from '$lib/components/games/CompareGame.svelte';
   import SpiderGame from '$lib/components/games/SpiderGame.svelte';
   import MoneyGame from '$lib/components/games/MoneyGame.svelte';
+  import TrainGame from '$lib/components/games/TrainGame.svelte';
 
   // Computed values for current game view
   const isMenu = $derived(gameStore.currentMode === 'menu');
@@ -19,12 +20,10 @@
 
   // 브라우저 히스토리 관리
   onMount(() => {
-    // 초기 상태 설정
     if (!history.state) {
       history.replaceState({ mode: 'menu' }, '');
     }
 
-    // 뒤로 가기 감지
     const handlePopState = (event: PopStateEvent) => {
       if (event.state && event.state.mode) {
         gameStore.setMode(event.state.mode);
@@ -34,18 +33,13 @@
     };
 
     window.addEventListener('popstate', handlePopState);
-
-    // 스토어 상태 변화 감시 (반응형 효과)
-    // Svelte 5에서는 $effect를 사용해 상태 변화 시 히스토리 추가
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
   });
 
-  // 게임 모드 변경 시 히스토리 추가 로직 (Svelte 5 Effect)
   $effect(() => {
     const mode = gameStore.currentMode;
-    // 현재 히스토리 상태와 다를 때만 push
     if (history.state?.mode !== mode) {
       history.pushState({ mode }, '', `#${mode}`);
     }
@@ -76,6 +70,8 @@
         <SpiderGame />
       {:else if gameStore.currentMode === 'money'}
         <MoneyGame />
+      {:else if gameStore.currentMode === 'train'}
+        <TrainGame />
       {/if}
     </div>
   {/if}

@@ -12,6 +12,7 @@
 
   const TOTAL_ROUNDS = 10;
   let round = $state(0);
+  let wrongCount = $state(0); // 현재 문제에서의 오답 횟수 추적
 
   onMount(() => {
     nextQuestion();
@@ -25,24 +26,30 @@
     currentQuestion = generateQuestion(gameStore.currentMode);
     feedback = '';
     isChecking = false;
+    wrongCount = 0; // 오답 횟수 리셋
     round += 1;
     gameStore.updateProgress(round - 1, TOTAL_ROUNDS);
   }
 
   function handleAnswer(choice: number) {
     if (isChecking || !currentQuestion) return;
-    isChecking = true;
 
     if (choice === currentQuestion.answer) {
+      isChecking = true;
       feedback = '참 잘했어요! ✨';
       gameStore.addScore(10, true);
       confettiRef?.fire();
       setTimeout(nextQuestion, 1500);
     } else {
+      wrongCount += 1;
       feedback = '다시 한번 생각해봐요! 💪';
-      gameStore.addScore(0, false);
+      
+      // 두 번째 틀렸을 때만 10점 감점
+      if (wrongCount === 2) {
+        gameStore.subtractScore(10);
+      }
+
       setTimeout(() => {
-        isChecking = false;
         feedback = '';
       }, 1500);
     }

@@ -55,27 +55,43 @@ class GameStore {
         }
     }
 
+    subtractScore(points: number) {
+        this.#state.score = Math.max(0, this.#state.score - points);
+        if (browser) {
+            localStorage.setItem('jiho_score', this.#state.score.toString());
+        }
+    }
+
     // 새로운 학습 기록 저장
-    saveCurrentRecord() {
-        if (this.#state.score === 0) return; // 0점은 기록하지 않음
+    saveCurrentRecord(): number {
+        if (this.#state.score === 0) return 0; // 0점은 기록하지 않음
 
         const now = new Date();
         const dateStr = `${now.getFullYear()}.${now.getMonth() + 1}.${now.getDate()} ${now.getHours()}:${now.getMinutes()}`;
         
+        const currentScore = this.#state.score;
         const newRecord: HistoryRecord = {
             id: Date.now().toString(),
             date: dateStr,
-            score: this.#state.score,
+            score: currentScore,
             correctAnswers: this.#state.correctAnswers
         };
 
-        this.#history = [newRecord, ...this.#history].slice(0, 50); // 최신순 정렬, 최대 50개 유지
+        this.#history = [newRecord, ...this.#history].slice(0, 50); 
         
         if (browser) {
             localStorage.setItem('jiho_history', JSON.stringify(this.#history));
         }
         
-        alert('오늘의 공부가 기록되었습니다! 잘했어요 지호야! 🏅');
+        // 기록 저장 후 점수 리셋
+        this.#state.score = 0;
+        this.#state.correctAnswers = 0;
+        if (browser) {
+            localStorage.setItem('jiho_score', '0');
+            localStorage.setItem('jiho_correct', '0');
+        }
+        
+        return currentScore;
     }
 
     updateProgress(current: number, total: number) {

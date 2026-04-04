@@ -21,6 +21,7 @@
   let confettiRef: any = $state();
   const TOTAL_ROUNDS = 5;
   let round = $state(0);
+  let wrongCount = $state(0); // 현재 문제에서의 오답 횟수 추적
 
   onMount(() => {
     nextQuestion();
@@ -60,6 +61,7 @@
     
     feedback = '';
     isChecking = false;
+    wrongCount = 0; // 오답 횟수 리셋
     round += 1;
     gameStore.updateProgress(round - 1, TOTAL_ROUNDS);
   }
@@ -67,18 +69,22 @@
   function handleAnswer(choice: string) {
     if (isChecking) return;
     const correctStr = `${clockData.hour}시 ${clockData.minute === 0 ? '정각' : clockData.minute + '분'}`;
-    isChecking = true;
 
     if (choice === correctStr) {
+      isChecking = true;
       feedback = '정답이에요! 시계를 잘 보네요! ⏰';
       gameStore.addScore(20, true);
       confettiRef?.fire();
       setTimeout(nextQuestion, 1500);
     } else {
+      wrongCount += 1;
       feedback = '시계 바늘을 다시 봐볼까요? 🧐';
-      gameStore.addScore(0, false);
+      
+      if (wrongCount === 2) {
+        gameStore.subtractScore(10);
+      }
+
       setTimeout(() => {
-        isChecking = false;
         feedback = '';
       }, 1500);
     }
