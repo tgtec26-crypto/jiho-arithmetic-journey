@@ -43,9 +43,24 @@
     {/each}
   </div>
 
-  <!-- Footer Mascot -->
-  <div class="mt-16 flex flex-col items-center opacity-60">
-      <img src="/—Pngtree—a squatting tabby cat_5803660.png" alt="tabby cat" class="w-32 h-32 object-contain" />
-      <p class="text-white text-sm font-bold mt-2">© 2026 지호의 산수 여행</p>
+  <!-- Footer Mascot & Exit -->
+  <div class="mt-12 flex flex-col items-center gap-6 opacity-80 pb-8">
+      <button 
+        onclick={() => {
+          if (confirm('공부를 정말 마칠까요?')) {
+            window.close();
+            // window.close()가 작동하지 않을 경우를 대비한 안내
+            alert('태블릿의 홈 버튼을 눌러 앱을 닫아주세요. 다음에 또 만나요!');
+          }
+        }}
+        class="bg-red-500 hover:bg-red-600 text-white font-black py-3 px-8 rounded-2xl shadow-lg border-b-4 border-red-800 transition-all active:scale-95 active:border-b-0"
+      >
+        공부 끝내기 🚪
+      </button>
+
+      <div class="flex flex-col items-center opacity-60">
+          <img src="/—Pngtree—a squatting tabby cat_5803660.png" alt="tabby cat" class="w-32 h-32 object-contain" />
+          <p class="text-white text-sm font-bold mt-2">© 2026 지호의 산수 여행</p>
+      </div>
   </div>
 </div>

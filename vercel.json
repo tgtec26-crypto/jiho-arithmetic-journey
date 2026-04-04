@@ -1,5 +1,6 @@
 {
   "version": 2,
   "cleanUrls": true,
-  "framework": "sveltekit"
+  "framework": "sveltekit",
+  "outputDirectory": "build"
 }
