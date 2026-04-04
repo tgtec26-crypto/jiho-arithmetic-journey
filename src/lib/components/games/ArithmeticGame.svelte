@@ -51,34 +51,49 @@
 
 <Confetti bind:this={confettiRef} />
 
-{#if currentQuestion}
-  <div class="flex flex-col items-center justify-center p-6 bg-white rounded-3xl shadow-xl border-b-8 border-deep-blue mx-4 transition-all">
-    <div class="text-6xl font-black text-deep-blue mb-8 tracking-tighter flex items-center gap-4">
-      <span>{currentQuestion.num1}</span>
-      <span class="text-4xl text-accent-yellow">{currentQuestion.operator}</span>
-      <span>{currentQuestion.num2}</span>
-      <span class="text-4xl text-accent-yellow">=</span>
-      <span class="text-accent-yellow">?</span>
-    </div>
+<!-- 레이아웃 최적화 컨테이너 -->
+<div class="flex flex-col items-center justify-around w-full max-w-5xl mx-auto flex-grow min-h-[60vh] gap-6 py-4 select-none">
+  
+  {#if currentQuestion}
+    <div class="flex flex-col items-center justify-center w-full bg-white rounded-[40px] shadow-2xl border-b-[12px] border-deep-blue p-10 transition-all">
+      <!-- 수식 영역 (크기 확대) -->
+      <div class="text-7xl sm:text-9xl font-black text-deep-blue mb-12 tracking-tighter flex items-center gap-6 sm:gap-10">
+        <span>{currentQuestion.num1}</span>
+        <span class="text-7xl sm:text-[9rem] text-[#E67E22]">{currentQuestion.operator}</span>
+        <span>{currentQuestion.num2}</span>
+        <span class="text-7xl sm:text-[9rem] text-[#E67E22]">=</span>
+        <span class="text-[#E67E22]">?</span>
+      </div>
 
-    <div class="grid grid-cols-2 gap-4 w-full max-w-sm">
-      {#each currentQuestion.options as option}
-        <button
-          onclick={() => handleAnswer(option)}
-          disabled={isChecking}
-          class="bg-bright-text border-4 border-deep-blue rounded-2xl p-6 text-3xl font-bold text-deep-blue 
-                 hover:bg-accent-yellow hover:scale-105 active:scale-95 transition-all
-                 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
-        >
-          {option}
-        </button>
-      {/each}
+      <!-- 정답 버튼 (1행 4열 가로 배치 최적화) -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 w-full max-w-4xl">
+        {#each currentQuestion.options as option}
+          <button
+            onclick={() => handleAnswer(option)}
+            disabled={isChecking}
+            class="bg-white border-b-8 border-gray-300 rounded-[30px] p-6 sm:p-8 text-4xl sm:text-6xl font-black text-deep-blue 
+                   hover:bg-bright-text hover:scale-105 active:scale-95 transition-all
+                   disabled:opacity-50 shadow-xl"
+          >
+            {option}
+          </button>
+        {/each}
+      </div>
     </div>
+  {/if}
 
+  <!-- 피드백 영역 -->
+  <div class="h-16 flex items-center justify-center">
     {#if feedback}
-      <div class="mt-8 text-2xl font-bold text-deep-blue animate-bounce">
+      <div class="text-3xl sm:text-5xl font-black text-white text-center animate-bounce drop-shadow-lg">
         {feedback}
       </div>
     {/if}
   </div>
-{/if}
+</div>
+
+<style>
+  button:disabled {
+    cursor: default;
+  }
+</style>

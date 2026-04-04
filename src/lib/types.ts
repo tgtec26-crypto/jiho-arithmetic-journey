@@ -40,3 +40,10 @@ export interface ClockState {
   displayMinute: number;
   options: string[];
 }
+
+export interface HistoryRecord {
+  id: string;
+  date: string;
+  score: number;
+  correctAnswers: number;
+}

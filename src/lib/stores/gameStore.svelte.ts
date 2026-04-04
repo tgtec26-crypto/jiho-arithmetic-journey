@@ -1,8 +1,7 @@
-import type { GameMode, IGameState } from '../types';
+import type { GameMode, IGameState, HistoryRecord } from '../types';
 import { browser } from '$app/environment';
 
 class GameStore {
-    // Svelte 5 Runes for reactive state
     #state = $state<IGameState>({
         currentMode: 'menu',
         score: 0,
@@ -12,12 +11,17 @@ class GameStore {
         isCompleted: false
     });
 
+    #history = $state<HistoryRecord[]>([]);
+
     constructor() {
         if (browser) {
             const savedScore = localStorage.getItem('jiho_score');
             const savedCorrect = localStorage.getItem('jiho_correct');
+            const savedHistory = localStorage.getItem('jiho_history');
+
             if (savedScore) this.#state.score = parseInt(savedScore);
             if (savedCorrect) this.#state.correctAnswers = parseInt(savedCorrect);
+            if (savedHistory) this.#history = JSON.parse(savedHistory);
         }
     }
 
@@ -28,6 +32,7 @@ class GameStore {
     get correctAnswers() { return this.#state.correctAnswers; }
     get progress() { return this.#state.progress; }
     get isCompleted() { return this.#state.isCompleted; }
+    get history() { return this.#history; }
 
     // Actions
     setMode(mode: GameMode) {
@@ -48,6 +53,29 @@ class GameStore {
             localStorage.setItem('jiho_score', this.#state.score.toString());
             localStorage.setItem('jiho_correct', this.#state.correctAnswers.toString());
         }
+    }
+
+    // 새로운 학습 기록 저장
+    saveCurrentRecord() {
+        if (this.#state.score === 0) return; // 0점은 기록하지 않음
+
+        const now = new Date();
+        const dateStr = `${now.getFullYear()}.${now.getMonth() + 1}.${now.getDate()} ${now.getHours()}:${now.getMinutes()}`;
+        
+        const newRecord: HistoryRecord = {
+            id: Date.now().toString(),
+            date: dateStr,
+            score: this.#state.score,
+            correctAnswers: this.#state.correctAnswers
+        };
+
+        this.#history = [newRecord, ...this.#history].slice(0, 50); // 최신순 정렬, 최대 50개 유지
+        
+        if (browser) {
+            localStorage.setItem('jiho_history', JSON.stringify(this.#history));
+        }
+        
+        alert('오늘의 공부가 기록되었습니다! 잘했어요 지호야! 🏅');
     }
 
     updateProgress(current: number, total: number) {
@@ -72,6 +100,13 @@ class GameStore {
         if (browser) {
             localStorage.removeItem('jiho_score');
             localStorage.removeItem('jiho_correct');
+        }
+    }
+
+    clearHistory() {
+        if (confirm('모든 기록을 삭제할까요?')) {
+            this.#history = [];
+            if (browser) localStorage.removeItem('jiho_history');
         }
     }
 }
