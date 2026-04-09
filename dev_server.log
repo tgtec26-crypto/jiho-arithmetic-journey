@@ -1,0 +1,11 @@
+
+> jiho-arithmetic-journey@0.0.1 dev
+> vite dev --host --port 5173
+
+Port 5173 is in use, trying another one...
+
+  VITE v7.3.1  ready in 459 ms
+
+  ➜  Local:   http://localhost:5174/
+  ➜  Network: http://172.30.6.227:5174/
+  ➜  Network: http://100.119.129.109:5174/

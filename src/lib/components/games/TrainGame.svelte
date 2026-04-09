@@ -93,22 +93,22 @@
     <p class="text-accent-yellow font-bold text-lg sm:text-xl mt-0.5 text-balance">새마을호에 실린 숫자를 더해보세요!</p>
   </div>
 
-  <div class="relative w-full flex-grow flex flex-col items-center justify-center min-h-0 {movementClass}">
-    <div class="relative w-[90%] max-w-[1200px] flex flex-col items-center">
+  <div class="relative w-full flex-grow flex flex-col items-center justify-center min-h-0 -translate-y-[30px] {movementClass}">
+    <div class="relative w-[118.8%] max-w-[1710px] flex flex-col items-center">
       <!-- 기차 이미지 (가로 기준, 찌그러짐 방지) -->
       <img src="/train.png" alt="새마을호" class="w-full h-auto drop-shadow-[0_15px_30px_rgba(0,0,0,0.6)]" />
       
       <!-- 숫자 카드 (기차 비율에 맞춰 배치) -->
-      <div class="absolute inset-0 flex items-center justify-center gap-[10%] sm:gap-[15%]" style="margin-top: 3%;">
+      <div class="absolute inset-0 flex items-center justify-center gap-[5%] sm:gap-[7.5%]" style="margin-top: 3%;">
         {#each nums as num}
-          <div class="w-[12%] aspect-square bg-white border-2 sm:border-4 border-[#003366] rounded-xl flex items-center justify-center text-3xl sm:text-6xl font-black text-[#003366] shadow-xl animate-in zoom-in duration-700">
+          <div class="w-[7.68%] aspect-square bg-white border-2 sm:border-4 border-[#003366] rounded-xl flex items-center justify-center text-xl sm:text-4xl font-black text-[#003366] shadow-xl animate-in zoom-in duration-700">
             {num}
           </div>
         {/each}
       </div>
 
       <!-- 철길 (기차 바퀴 아래 밀착) -->
-      <div class="w-[110%] h-6 sm:h-10 mt-[-7%] sm:mt-[-8%] relative z-0">
+      <div class="w-[85%] h-6 sm:h-10 mt-[-7%] sm:mt-[-8%] relative z-0">
         <div class="absolute top-1/2 left-0 w-full h-10 bg-black/40 -translate-y-1/2 blur-lg"></div>
         <div class="absolute top-0 w-full h-2 bg-gradient-to-b from-[#999] via-[#eee] to-[#666] shadow-sm"></div>
         <div class="absolute bottom-0 w-full h-2 bg-gradient-to-b from-[#999] via-[#eee] to-[#666] shadow-sm"></div>
