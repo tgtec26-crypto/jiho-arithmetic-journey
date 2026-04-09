@@ -93,12 +93,12 @@
     <p class="text-accent-yellow font-bold text-lg sm:text-xl mt-0.5 text-balance">새마을호에 실린 숫자를 더해보세요!</p>
   </div>
 
-  <div class="relative w-full flex-grow flex flex-col items-center justify-center min-h-0 pt-0 mt-[-10px]">
-    <div class="relative flex flex-col items-center z-10 {movementClass}">
-      <div class="relative w-[800px] sm:w-[1080px] h-auto flex flex-col items-center">
-        <img src="/train.png" alt="새마을호" class="w-full h-auto drop-shadow-[0_15px_30px_rgba(0,0,0,0.6)]" />
+  <div class="relative w-full flex-grow flex flex-col items-center justify-center min-h-0 pt-0 mt-[-40px] sm:mt-[-60px]">
+    <div class="relative flex flex-col items-center z-10 {movementClass} flex-grow min-h-0">
+      <div class="relative w-auto h-full max-h-[40vh] flex flex-col items-center">
+        <img src="/train.png" alt="새마을호" class="h-full w-auto object-contain drop-shadow-[0_15px_30px_rgba(0,0,0,0.6)]" />
         <!-- 벽면에 완전히 밀착된 숫자 판 (최종 미세 조정 - 위로 15px 이동) -->
-        <div class="absolute inset-0 flex items-center justify-center gap-10 sm:gap-28" style="margin-top: 20px;">
+        <div class="absolute inset-0 flex items-center justify-center gap-10 sm:gap-28" style="margin-top: 5%;">
           {#each nums as num}
             <div class="w-12 h-12 sm:w-20 sm:h-20 bg-white border-2 sm:border-4 border-[#003366] rounded-xl flex items-center justify-center text-3xl sm:text-6xl font-black text-[#003366] shadow-xl animate-in zoom-in duration-700">
               {num}
@@ -108,8 +108,8 @@
       </div>
     </div>
 
-    <!-- 선명한 철길 (기차와 더 가깝게 30px 위로 조정) -->
-    <div class="w-full h-8 mt-[-70px] sm:mt-[-85px] relative z-0">
+    <!-- 선명한 철길 (기차 높이에 맞게 가변적으로 조정) -->
+    <div class="w-full h-8 mt-[-30px] sm:mt-[-40px] relative z-0">
       <div class="absolute top-1/2 left-0 w-full h-10 bg-black/40 -translate-y-1/2 blur-lg"></div>
       <div class="absolute top-0 w-full h-2 bg-gradient-to-b from-[#999] via-[#eee] to-[#666] shadow-sm"></div>
       <div class="absolute bottom-0 w-full h-2 bg-gradient-to-b from-[#999] via-[#eee] to-[#666] shadow-sm"></div>
