@@ -8,6 +8,7 @@ export type GameMode =
   | 'compare' 
   | 'money'
   | 'train'
+  | 'ktx'
   | 'menu';
 
 export interface Question {

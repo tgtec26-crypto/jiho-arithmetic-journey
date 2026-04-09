@@ -7,7 +7,7 @@
   let sum = $derived(nums.reduce((a, b) => a + b, 0));
   let options = $state<number[]>([]);
   
-  let movementClass = $state<'train-hidden' | 'train-entering' | 'train-leaving' | 'train-stopped'>('train-hidden');
+  let movementClass = $state<'ktx-hidden' | 'ktx-entering' | 'ktx-leaving' | 'ktx-stopped'>('ktx-hidden');
   let feedback = $state('');
   let isChecking = $state(false);
   let wrongCount = $state(0);
@@ -43,14 +43,14 @@
     isChecking = false;
     wrongCount = 0;
     
-    movementClass = 'train-hidden';
+    movementClass = 'ktx-hidden';
     
     setTimeout(() => {
-      movementClass = 'train-entering';
-      // 4초 등장 애니메이션 완료 후 정지
+      movementClass = 'ktx-entering';
+      // 3초 등장 애니메이션 완료 후 정지 (KTX는 조금 더 빠름)
       setTimeout(() => {
-        movementClass = 'train-stopped';
-      }, 4000);
+        movementClass = 'ktx-stopped';
+      }, 3000);
     }, 100);
 
     round += 1;
@@ -58,19 +58,19 @@
   }
 
   function handleAnswer(choice: number) {
-    if (isChecking || movementClass !== 'train-stopped') return;
+    if (isChecking || movementClass !== 'ktx-stopped') return;
 
     if (choice === sum) {
       isChecking = true;
-      feedback = '정답! 새마을호 출발! 🚂💨';
+      feedback = '정답! KTX-산천 출발! 🚅💨';
       gameStore.addScore(30, true);
       confettiRef?.fire();
       
       setTimeout(() => {
-        movementClass = 'train-leaving'; 
+        movementClass = 'ktx-leaving'; 
       }, 500);
 
-      setTimeout(startNewRound, 4500);
+      setTimeout(startNewRound, 4000);
     } else {
       wrongCount += 1;
       feedback = '음, 다시 한번 더해볼까요? 🧐';
@@ -89,16 +89,15 @@
 <div class="flex flex-col items-center justify-between w-full h-[calc(100vh-140px)] max-w-6xl mx-auto px-4 py-1 select-none overflow-hidden">
   
   <div class="text-center mt-1 mb-0">
-    <h2 class="text-4xl sm:text-5xl font-black text-white drop-shadow-lg tracking-tight">새마을호 더하기</h2>
-    <p class="text-accent-yellow font-bold text-lg sm:text-xl mt-0.5 text-balance">새마을호에 실린 숫자를 더해보세요!</p>
+    <h2 class="text-4xl sm:text-5xl font-black text-white drop-shadow-lg tracking-tight">KTX 더하기</h2>
+    <p class="text-accent-yellow font-bold text-lg sm:text-xl mt-0.5 text-balance">KTX-산천에 실린 숫자를 더해보세요!</p>
   </div>
 
-  <div class="relative w-full flex-grow flex flex-col items-center justify-center min-h-0 pt-0 mt-[-10px]">
+  <div class="relative w-full flex-grow flex flex-col items-center justify-center min-h-0 pt-0 mt-[-60px] sm:mt-[-80px]">
     <div class="relative flex flex-col items-center z-10 {movementClass}">
       <div class="relative w-[800px] sm:w-[1080px] h-auto flex flex-col items-center">
-        <img src="/train.png" alt="새마을호" class="w-full h-auto drop-shadow-[0_15px_30px_rgba(0,0,0,0.6)]" />
-        <!-- 벽면에 완전히 밀착된 숫자 판 (최종 미세 조정 - 위로 15px 이동) -->
-        <div class="absolute inset-0 flex items-center justify-center gap-10 sm:gap-28" style="margin-top: 20px;">
+        <img src="/ktx.png" alt="KTX-산천" class="w-full h-auto drop-shadow-[0_15px_30px_rgba(0,0,0,0.6)]" />
+        <div class="absolute inset-0 flex items-center justify-center gap-10 sm:gap-28" style="margin-top: 35px;">
           {#each nums as num}
             <div class="w-12 h-12 sm:w-20 sm:h-20 bg-white border-2 sm:border-4 border-[#003366] rounded-xl flex items-center justify-center text-3xl sm:text-6xl font-black text-[#003366] shadow-xl animate-in zoom-in duration-700">
               {num}
@@ -108,8 +107,8 @@
       </div>
     </div>
 
-    <!-- 선명한 철길 (기차와 더 가깝게 30px 위로 조정) -->
-    <div class="w-full h-8 mt-[-70px] sm:mt-[-85px] relative z-0">
+    <!-- 선명한 철길 (기차와 더 가깝게 20px 추가로 더 위로 조정) -->
+    <div class="w-full h-8 mt-[-170px] sm:mt-[-195px] relative z-0">
       <div class="absolute top-1/2 left-0 w-full h-10 bg-black/40 -translate-y-1/2 blur-lg"></div>
       <div class="absolute top-0 w-full h-2 bg-gradient-to-b from-[#999] via-[#eee] to-[#666] shadow-sm"></div>
       <div class="absolute bottom-0 w-full h-2 bg-gradient-to-b from-[#999] via-[#eee] to-[#666] shadow-sm"></div>
@@ -123,7 +122,7 @@
 
   <div class="w-full max-w-4xl grid grid-cols-2 sm:grid-cols-4 gap-4 px-4 mb-2 mt-4">
     {#each options as option}
-      <button onclick={() => handleAnswer(option)} disabled={isChecking || movementClass !== 'train-stopped'}
+      <button onclick={() => handleAnswer(option)} disabled={isChecking || movementClass !== 'ktx-stopped'}
         class="bg-white border-b-8 border-gray-300 rounded-[30px] py-5 text-3xl sm:text-5xl font-black text-deep-blue shadow-xl hover:scale-105 active:scale-95 transition-all disabled:opacity-50">
         {option}
       </button>
@@ -136,23 +135,20 @@
 </div>
 
 <style>
-  .train-hidden { transform: translateX(150%); }
+  .ktx-hidden { transform: translateX(150%); }
 
-  /* 초저속 진입 연출 (4초) */
-  .train-entering {
-    animation: entering-slow-bounce 4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  .ktx-entering {
+    animation: entering-move 3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
-  .train-stopped { transform: translateX(0); }
+  .ktx-stopped { transform: translateX(0); }
 
-  .train-leaving {
-    animation: leaving-move 3.5s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
+  .ktx-leaving {
+    animation: leaving-move 3s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
   }
 
-  @keyframes entering-slow-bounce {
+  @keyframes entering-move {
     0% { transform: translateX(150%); }
-    85% { transform: translateX(0); } /* 85% 지점까지 천천히 미끄러짐 */
-    92% { transform: translateX(-10px); } /* 덜컥! 부드럽게 쏠림 */
     100% { transform: translateX(0); }
   }
 

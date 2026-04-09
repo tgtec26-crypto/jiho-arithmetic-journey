@@ -13,6 +13,7 @@
   import SpiderGame from '$lib/components/games/SpiderGame.svelte';
   import MoneyGame from '$lib/components/games/MoneyGame.svelte';
   import TrainGame from '$lib/components/games/TrainGame.svelte';
+  import KTXGame from '$lib/components/games/KTXGame.svelte';
 
   // Computed values for current game view
   const isMenu = $derived(gameStore.currentMode === 'menu');
@@ -72,6 +73,8 @@
         <MoneyGame />
       {:else if gameStore.currentMode === 'train'}
         <TrainGame />
+      {:else if gameStore.currentMode === 'ktx'}
+        <KTXGame />
       {/if}
     </div>
   {/if}
