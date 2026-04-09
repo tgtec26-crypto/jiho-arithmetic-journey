@@ -13,12 +13,13 @@ export default defineConfig({
 				maximumFileSizeToCacheInBytes: 25 * 1024 * 1024
 			},
 			manifest: {
+				id: 'jiho-arithmetic-journey-v1',
 				name: '지호의 산수 여행',
 				short_name: '산수 여행',
 				description: '만 6세를 위한 즐거운 사칙연산 학습 게임',
 				start_url: '/',
 				display: 'fullscreen',
-				orientation: 'any',
+				orientation: 'landscape',
 				background_color: '#003366',
 				theme_color: '#003366',
 				icons: [
