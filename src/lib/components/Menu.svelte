@@ -14,7 +14,9 @@
     { mode: 'compare' as GameMode, icon: '⚖️' },
     { mode: 'money' as GameMode, icon: '💰' },
     { mode: 'train' as GameMode, icon: '🚂' },
-    { mode: 'ktx' as GameMode, icon: '🚅' }
+    { mode: 'ktx' as GameMode, icon: '🚅' },
+    { mode: 'itx' as GameMode, icon: '🚆' },
+    { mode: 'fraction' as GameMode, icon: '🍕' }
   ];
 
   let showHistory = $state(false);

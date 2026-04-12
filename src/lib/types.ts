@@ -9,6 +9,8 @@ export type GameMode =
   | 'money'
   | 'train'
   | 'ktx'
+  | 'itx'
+  | 'fraction'
   | 'menu';
 
 export interface Question {
