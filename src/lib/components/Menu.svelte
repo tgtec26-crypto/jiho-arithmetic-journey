@@ -16,7 +16,8 @@
     { mode: 'train' as GameMode, icon: '🚂' },
     { mode: 'ktx' as GameMode, icon: '🚅' },
     { mode: 'itx' as GameMode, icon: '🚆' },
-    { mode: 'fraction' as GameMode, icon: '🍕' }
+    { mode: 'fraction' as GameMode, icon: '🍕' },
+    { mode: 'motor' as GameMode, icon: '⚙️' }
   ];
 
   let showHistory = $state(false);

@@ -11,6 +11,7 @@ export type GameMode =
   | 'ktx'
   | 'itx'
   | 'fraction'
+  | 'motor'
   | 'menu';
 
 export interface Question {
