@@ -100,21 +100,24 @@
     <p class="text-accent-yellow font-bold text-lg sm:text-xl mt-0.5 text-balance">ITX-청춘에 실린 숫자를 더해보세요!</p>
   </div>
 
-  <div class="relative w-full flex-grow flex flex-col items-center justify-center min-h-0 -translate-y-[60px] {movementClass} pointer-events-none">
+  <div class="relative w-full flex-grow flex flex-col items-center justify-center min-h-0 -translate-y-[60px] pointer-events-none">
     <div class="relative w-[100%] max-w-[1320px] flex flex-col items-center pointer-events-auto">
-      <!-- ITX 기차 이미지 -->
-      <img src="/itx.png" alt="ITX-청춘" class="w-full h-auto drop-shadow-[0_15px_30px_rgba(0,0,0,0.6)]" />
-      
-      <!-- 숫자 카드 (기차 몸체 위치에 맞춰 15px 상단으로 조정) -->
-      <div class="absolute inset-0 flex items-center justify-center gap-[5%] sm:gap-[7.5%] translate-y-[5px]" style="margin-top: 3%;">
-        {#each nums as num}
-          <div class="w-[10.2%] aspect-square bg-white border-2 sm:border-4 border-[#006400] rounded-xl flex items-center justify-center text-3xl sm:text-5xl font-black text-[#006400] shadow-xl animate-in zoom-in duration-700">
-            {num}
-          </div>
-        {/each}
+      <!-- 움직이는 부분: 기차 이미지 + 숫자 카드 -->
+      <div class="relative w-full {movementClass}">
+        <!-- ITX 기차 이미지 -->
+        <img src="/itx.png" alt="ITX-청춘" class="w-full h-auto drop-shadow-[0_15px_30px_rgba(0,0,0,0.6)]" />
+
+        <!-- 숫자 카드 (기차 몸체 위치에 맞춰 15px 상단으로 조정) -->
+        <div class="absolute inset-0 flex items-center justify-center gap-[5%] sm:gap-[7.5%] translate-y-[5px]" style="margin-top: 3%;">
+          {#each nums as num}
+            <div class="w-[10.2%] aspect-square bg-white border-2 sm:border-4 border-[#006400] rounded-xl flex items-center justify-center text-3xl sm:text-5xl font-black text-[#006400] shadow-xl animate-in zoom-in duration-700">
+              {num}
+            </div>
+          {/each}
+        </div>
       </div>
 
-      <!-- 철길 (기차 바퀴 위치에 맞춰 30px 하단으로 이동) -->
+      <!-- 철길 (기차 바퀴 위치에 맞춰 30px 하단으로 이동, 고정) -->
       <div class="w-[110%] h-6 sm:h-10 mt-[-2%] sm:mt-[-3%] relative z-0 translate-y-[30px]">
         <div class="absolute top-1/2 left-0 w-full h-10 bg-black/40 -translate-y-1/2 blur-lg"></div>
         <div class="absolute top-0 w-full h-2 bg-gradient-to-b from-[#999] via-[#eee] to-[#666] shadow-sm"></div>
