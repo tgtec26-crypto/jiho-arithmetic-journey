@@ -3,7 +3,7 @@
   import { gameStore } from '$lib/stores/gameStore.svelte';
   import Confetti from '../Confetti.svelte';
 
-  type MotorType = 'L' | 'M' | 'XL' | 'dr';
+  type MotorType = 'L' | 'M' | 'XL' | 'dr' | 'battery';
 
   interface MotorConfig {
     type: MotorType;
@@ -17,10 +17,11 @@
   }
 
   const MOTORS: Record<MotorType, MotorConfig> = {
-    L:  { type: 'L',  img: '/motor/L_motor.png',  label: 'L 모터',   border: '#1d4ed8', bg: '#dbeafe', text: '#1e3a8a', axleX: 24, axleY: 68 },
-    M:  { type: 'M',  img: '/motor/m_motor.png',  label: 'M 모터',   border: '#b91c1c', bg: '#fee2e2', text: '#7f1d1d', axleX: 22, axleY: 67 },
-    XL: { type: 'XL', img: '/motor/xl_motor.png', label: 'XL 모터',  border: '#c2410c', bg: '#ffedd5', text: '#7c2d12', axleX: 20, axleY: 65 },
-    dr: { type: 'dr', img: '/motor/dr_motor.png', label: '조향 모터', border: '#15803d', bg: '#dcfce7', text: '#14532d', axleX: 19, axleY: 67 }
+    L:       { type: 'L',       img: '/motor/L_motor.png',     label: 'L 모터',    border: '#1d4ed8', bg: '#dbeafe', text: '#1e3a8a', axleX: 20, axleY: 68 },
+    M:       { type: 'M',       img: '/motor/m_motor.png',     label: 'M 모터',    border: '#b91c1c', bg: '#fee2e2', text: '#7f1d1d', axleX: 19, axleY: 67 },
+    XL:      { type: 'XL',      img: '/motor/xl_motor.png',    label: 'XL 모터',   border: '#c2410c', bg: '#ffedd5', text: '#7c2d12', axleX: 20, axleY: 56 },
+    dr:      { type: 'dr',      img: '/motor/dr_motor.png',    label: '조향 모터', border: '#15803d', bg: '#dcfce7', text: '#14532d', axleX: 19, axleY: 67 },
+    battery: { type: 'battery', img: '/motor/batterypack.png', label: '배터리팩', border: '#a16207', bg: '#fef3c7', text: '#713f12', axleX: 60, axleY: 55 }
   };
 
   interface PlacedMotor {
@@ -50,21 +51,21 @@
   });
 
   function pickPositions(count: number): { left: number; top: number }[] {
-    // 4 cols × 2 rows = 8 slots — pick `count` unique slots and add jitter
+    // 5 cols × 2 rows = 10 slots — pick `count` unique slots and add jitter
     const slots: { col: number; row: number }[] = [];
     for (let r = 0; r < 2; r++) {
-      for (let c = 0; c < 4; c++) {
+      for (let c = 0; c < 5; c++) {
         slots.push({ col: c, row: r });
       }
     }
     slots.sort(() => Math.random() - 0.5);
     return slots.slice(0, count).map(({ col, row }) => {
-      const baseLeft = (col + 0.5) * 25;       // 12.5 / 37.5 / 62.5 / 87.5
+      const baseLeft = (col + 0.5) * 20;       // 10 / 30 / 50 / 70 / 90
       const baseTop  = (row + 0.5) * 50;       // 25 / 75
-      const jitterX = (Math.random() - 0.5) * 8;
+      const jitterX = (Math.random() - 0.5) * 6;
       const jitterY = (Math.random() - 0.5) * 14;
       return {
-        left: Math.max(12, Math.min(88, baseLeft + jitterX)),
+        left: Math.max(10, Math.min(90, baseLeft + jitterX)),
         top:  Math.max(22, Math.min(78, baseTop  + jitterY))
       };
     });
@@ -76,9 +77,9 @@
       return;
     }
 
-    const motorTypes: MotorType[] = ['L', 'M', 'XL', 'dr'];
+    const motorTypes: MotorType[] = ['L', 'M', 'XL', 'dr', 'battery'];
 
-    // 각 타입 1~2개씩 → 총 4~8개
+    // 각 타입 1~2개씩 → 총 5~10개
     const picked: MotorType[] = [];
     for (const t of motorTypes) {
       const reps = Math.floor(Math.random() * 2) + 1; // 1 or 2
@@ -87,18 +88,19 @@
     picked.sort(() => Math.random() - 0.5);
     const count = picked.length;
 
-    // 각 타입마다 서로 다른 숫자 (1~5 중 4개 unique)
+    // 각 타입마다 서로 다른 숫자 (1~5 unique)
     const pool = [1, 2, 3, 4, 5].sort(() => Math.random() - 0.5);
     const numberByType: Record<MotorType, number> = {
-      L:  pool[0],
-      M:  pool[1],
-      XL: pool[2],
-      dr: pool[3]
+      L:       pool[0],
+      M:       pool[1],
+      XL:      pool[2],
+      dr:      pool[3],
+      battery: pool[4]
     };
 
     const positions = pickPositions(count);
-    // 개수에 따라 모터 크기 축소 (110% 추가 적용)
-    const motorWidth = count <= 4 ? 242 : count <= 6 ? 218 : 194;
+    // 개수에 따라 모터 크기 축소
+    const motorWidth = count <= 5 ? 218 : count <= 7 ? 194 : 172;
     const cardSize = Math.round(motorWidth * 0.36);
 
     placed = picked.map((t, i) => ({
